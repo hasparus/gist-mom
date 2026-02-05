@@ -1,0 +1,25 @@
+name = "gist-mom"
+main = "src/server/index.ts"
+compatibility_date = "2023-12-01"
+
+[vars]
+# partykit config
+PARTYKIT_HOST = "127.0.0.1:1999"
+
+[[durable_objects.bindings]]
+name = "PARTYKIT_DEFAULTS"
+class_name = "PartyServer"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["PartyServer"]
+
+[site]
+bucket = "dist"
+
+[build]
+watch_dir = "src/server"
+
+[dev]
+ip = "127.0.0.1"
+port = 8787

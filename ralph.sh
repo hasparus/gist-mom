@@ -32,23 +32,24 @@ while [ $ITERATION -lt $MAX_ITERATIONS ]; do
     ITERATION=$((ITERATION + 1))
     echo "--- Iteration $ITERATION/$MAX_ITERATIONS ($(date '+%H:%M:%S')) ---" | tee -a "$LOG_FILE"
 
+    ITER_LOG=$(mktemp)
     case "$ENGINE" in
       gemini)
-        OUTPUT=$(gemini -m "$MODEL" --yolo "$PROMPT" 2>&1) || true
+        gemini -m "$MODEL" --yolo "$PROMPT" 2>&1 | tee "$ITER_LOG" || true
         ;;
       amp)
-        OUTPUT=$(amp --dangerously-allow-all -x "$PROMPT" 2>&1) || true
+        amp --dangerously-allow-all -x "$PROMPT" 2>&1 | tee "$ITER_LOG" || true
         ;;
       opencode)
-        OUTPUT=$(opencode run "$PROMPT" 2>&1) || true
+        opencode run "$PROMPT" 2>&1 | tee "$ITER_LOG" || true
         ;;
       *)
         echo "Unknown engine: $ENGINE" >&2; exit 1
         ;;
     esac
-
-    echo "$OUTPUT" >> "$LOG_FILE"
-    echo "$OUTPUT" | tail -20
+    OUTPUT=$(cat "$ITER_LOG")
+    cat "$ITER_LOG" >> "$LOG_FILE"
+    rm -f "$ITER_LOG"
     echo ""
 
     # Git checkpoint
