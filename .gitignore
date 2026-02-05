@@ -1,0 +1,6 @@
+.DS_Store
+.envrc
+node_modules/
+playwright-report/
+test-results/
+*.log
