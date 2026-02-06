@@ -189,7 +189,7 @@ export function EditorPage({
         <div role="status" aria-live="polite" className="max-w-4xl w-full pl-2 pr-4 pt-4 text-sm text-muted-foreground">Connecting...</div>
       ) : (
         <>
-          <div className="flex-1 overflow-auto max-w-4xl px-0.5">
+          <div className={`flex-1 overflow-auto max-w-4xl px-0.5${showPreview ? " max-sm:hidden" : ""}`}>
             <Editor
               ytext={collab.ydoc.getText("content")}
               awareness={collab.provider.awareness}
@@ -197,7 +197,7 @@ export function EditorPage({
             />
           </div>
           {showPreview && (
-            <div className="flex-1 overflow-auto border-l border-border max-w-4xl">
+            <div className="flex-1 overflow-auto sm:border-l border-border max-w-4xl">
               <Preview content={content} />
             </div>
           )}
