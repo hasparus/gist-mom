@@ -179,18 +179,18 @@ app.get("/api/stars", async (c) => {
         },
       }
     );
+    if (!res.ok) return c.json({ stars: null }, 502);
     const data = (await res.json()) as { stargazers_count?: number };
     const stars = data.stargazers_count ?? 0;
-    const response = c.json({ stars });
-    // Clone before caching (response body can only be consumed once)
-    const toCache = new Response(JSON.stringify({ stars }), {
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=3600",
-      },
-    });
-    c.executionCtx.waitUntil(cache.put(cacheUrl, toCache));
-    return response;
+    const body = JSON.stringify({ stars });
+    const headers = {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=3600",
+    };
+    c.executionCtx.waitUntil(
+      cache.put(cacheUrl, new Response(body, { headers }))
+    );
+    return new Response(body, { headers });
   } catch {
     return c.json({ stars: null }, 502);
   }
