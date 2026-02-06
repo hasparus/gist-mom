@@ -6,4 +6,5 @@ interface Env {
   GITHUB_CLIENT_SECRET: string;
   AUTH_BASE_URL?: string;
   BETTER_AUTH_SECRET: string;
+  GITHUB_STARS_TOKEN?: string;
 }

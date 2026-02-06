@@ -170,14 +170,16 @@ app.get("/api/stars", async (c) => {
   if (cached) return cached;
 
   try {
+    const fetchHeaders: Record<string, string> = {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "gist.mom",
+    };
+    if (c.env.GITHUB_STARS_TOKEN) {
+      fetchHeaders.Authorization = `Bearer ${c.env.GITHUB_STARS_TOKEN}`;
+    }
     const res = await fetch(
       "https://api.github.com/repos/hasparus/gist-mom",
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "gist.mom",
-        },
-      }
+      { headers: fetchHeaders }
     );
     if (!res.ok) return c.json({ stars: null }, 502);
     const data = (await res.json()) as { stargazers_count?: number };
@@ -191,7 +193,8 @@ app.get("/api/stars", async (c) => {
       cache.put(cacheUrl, new Response(body, { headers }))
     );
     return new Response(body, { headers });
-  } catch {
+  } catch (e) {
+    console.error("GET /api/stars error:", e);
     return c.json({ stars: null }, 502);
   }
 });
