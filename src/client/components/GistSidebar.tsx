@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
 import { FileTextIcon } from "lucide-react";
 import { navigate } from "../lib/router";
 import type { Session } from "../lib/types";
+import type { GistSummary } from "../lib/use-gists";
 import {
   Sidebar,
   SidebarContent,
@@ -12,15 +12,8 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuSkeleton,
+  SidebarTrigger,
 } from "./ui/sidebar";
-
-type GistSummary = {
-  id: string;
-  description: string | null;
-  owner: { login: string } | null;
-  files: Record<string, { filename: string }>;
-  updated_at: string;
-};
 
 function gistLabel(g: GistSummary): string {
   if (g.description) return g.description;
@@ -32,41 +25,25 @@ function gistLabel(g: GistSummary): string {
 export function GistSidebar({
   session,
   currentGistId,
+  gists,
+  loading,
+  error,
 }: {
   session: Session;
   currentGistId: string;
+  gists: GistSummary[];
+  loading: boolean;
+  error: string | null;
 }) {
-  const [gists, setGists] = useState<GistSummary[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!session) {
-      setGists([]);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    fetch("/api/gists", { credentials: "include" })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`${res.status}`);
-        return res.json() as Promise<GistSummary[]>;
-      })
-      .then(setGists)
-      .catch((e) => setError(String(e)))
-      .finally(() => setLoading(false));
-  }, [session]);
-
   if (!session) return null;
 
   return (
     <Sidebar variant="floating" collapsible="offcanvas">
-      <SidebarHeader className="px-3 pt-3">
+      <SidebarHeader className="px-3 pt-3 flex-row items-center justify-between">
         <span className="text-sm font-medium text-sidebar-foreground">
           Your Gists
         </span>
+        <SidebarTrigger />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

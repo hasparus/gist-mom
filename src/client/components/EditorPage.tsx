@@ -158,7 +158,7 @@ export function EditorPage({
   return (
     <div className="flex-1 flex overflow-hidden justify-center">
       {!collab ? (
-        <div className="p-8 text-muted-foreground">Connecting...</div>
+        <div className="max-w-4xl w-full px-4 pt-4 text-muted-foreground">Connecting...</div>
       ) : (
         <>
           <div className="flex-1 overflow-auto max-w-4xl px-0.5">

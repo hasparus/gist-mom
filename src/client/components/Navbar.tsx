@@ -15,6 +15,7 @@ export function Navbar({
   onCommit,
   committing,
   hasChanges,
+  onPrefetchGists,
 }: {
   session: Session;
   user: string;
@@ -24,11 +25,16 @@ export function Navbar({
   onCommit: () => void;
   committing: boolean;
   hasChanges: boolean;
+  onPrefetchGists?: () => void;
 }) {
   return (
-    <nav className="flex items-center gap-2 h-11 border-b border-border shrink-0">
+    <nav className="flex items-center h-11 border-b border-border shrink-0">
+      {session && (
+        <div className="shrink-0 pl-2" onMouseEnter={onPrefetchGists}>
+          <SidebarTrigger />
+        </div>
+      )}
       <div className="flex items-center gap-2 w-full max-w-4xl mx-auto px-2">
-        {session && <SidebarTrigger />}
         <div className="flex items-center gap-1">
           <a
             href="/"
@@ -88,6 +94,8 @@ export function Navbar({
           </Button>
         )}
       </div>
+      {/* Spacer to balance the sidebar trigger so the center bar stays centered */}
+      {session && <div className="shrink-0 pl-2 invisible"><SidebarTrigger /></div>}
     </nav>
   );
 }

@@ -36,6 +36,19 @@ async function getGitHubToken(env: Env, headers: Headers) {
   return row?.accessToken ?? null;
 }
 
+function getGistRoomStub(env: Env, gistId: string) {
+  const doId = env.GistRoom.idFromName(gistId);
+  const stub = env.GistRoom.get(doId);
+  return {
+    fetch(path: string, init?: RequestInit) {
+      const headers = new Headers(init?.headers);
+      headers.set("x-partykit-room", gistId);
+      headers.set("x-partykit-namespace", "gist-room");
+      return stub.fetch(`https://dummy${path}`, { ...init, headers });
+    },
+  };
+}
+
 app.get("/api/gists/:id", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);
   const gistId = c.req.param("id");
@@ -45,20 +58,15 @@ app.get("/api/gists/:id", async (c) => {
     const files = Object.values(gist.files);
     if (files.length > 0) {
       const file = files[0]!;
-      // Seed the DO with the gist content (no-op if already populated)
-      const doId = c.env.GistRoom.idFromName(gistId);
-      const stub = c.env.GistRoom.get(doId);
-      await stub.fetch(
-        new URL(`/parties/gist-room/${gistId}/seed`, c.req.url).toString(),
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            filename: file.filename,
-            content: file.content,
-          }),
-        }
-      );
+      const room = getGistRoomStub(c.env, gistId);
+      await room.fetch("/seed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.filename,
+          content: file.content,
+        }),
+      });
     }
     return c.json({
       id: gist.id,
@@ -75,7 +83,9 @@ app.get("/api/gists/:id", async (c) => {
     if (e instanceof GitHubApiError) {
       return c.json({ error: e.message }, e.status as 403 | 404);
     }
-    return c.json({ error: "Failed to fetch gist" }, 502);
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("GET /api/gists/:id error:", msg);
+    return c.json({ error: msg }, 502);
   }
 });
 
@@ -85,12 +95,8 @@ app.post("/api/gists/:id/commit", async (c) => {
 
   const gistId = c.req.param("id");
   try {
-    // Read current content from the DO
-    const doId = c.env.GistRoom.idFromName(gistId);
-    const stub = c.env.GistRoom.get(doId);
-    const contentRes = await stub.fetch(
-      new URL(`/parties/gist-room/${gistId}/content`, c.req.url).toString()
-    );
+    const room = getGistRoomStub(c.env, gistId);
+    const contentRes = await room.fetch("/content");
     if (!contentRes.ok) return c.json({ error: "Failed to read document" }, 502);
     const { content, filename, lastCommittedContent } =
       (await contentRes.json()) as {
@@ -105,11 +111,7 @@ app.post("/api/gists/:id/commit", async (c) => {
 
     const result = await updateGist(gistId, filename, content, token);
 
-    // Update lastCommittedContent in DO
-    await stub.fetch(
-      new URL(`/parties/gist-room/${gistId}/committed`, c.req.url).toString(),
-      { method: "POST", body: content }
-    );
+    await room.fetch("/committed", { method: "POST", body: content });
 
     return c.json(result);
   } catch {

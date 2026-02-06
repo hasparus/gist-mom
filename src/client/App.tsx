@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { parseRoute, type Route } from "./lib/router";
 import { useSession } from "./lib/auth-client";
+import { useGists } from "./lib/use-gists";
 import { Navbar } from "./components/Navbar";
 import { EditorPage } from "./components/EditorPage";
 import { GistSidebar } from "./components/GistSidebar";
@@ -11,6 +12,7 @@ export default function App() {
     parseRoute(window.location.pathname)
   );
   const { data: session } = useSession();
+  const { gists, loading: gistsLoading, error: gistsError, prefetch: prefetchGists } = useGists();
   const [showPreview, setShowPreview] = useState(false);
   const [committing, setCommitting] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -53,7 +55,13 @@ export default function App() {
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <GistSidebar session={session} currentGistId={route.gistId} />
+      <GistSidebar
+        session={session}
+        currentGistId={route.gistId}
+        gists={gists}
+        loading={gistsLoading}
+        error={gistsError}
+      />
       <SidebarInset className="h-dvh">
         <Navbar
           session={session}
@@ -64,6 +72,7 @@ export default function App() {
           onCommit={handleCommit}
           committing={committing}
           hasChanges={hasChanges}
+          onPrefetchGists={prefetchGists}
         />
         <EditorPage
           key={route.gistId}
