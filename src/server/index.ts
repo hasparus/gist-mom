@@ -49,12 +49,25 @@ app.post("/api/gists/:id/commit", async (c) => {
       new URL(`/parties/gist-room/${gistId}/content`, c.req.url).toString()
     );
     if (!contentRes.ok) return c.json({ error: "Failed to read document" }, 502);
-    const { content, filename } = (await contentRes.json()) as {
-      content: string;
-      filename: string;
-    };
+    const { content, filename, lastCommittedContent } =
+      (await contentRes.json()) as {
+        content: string;
+        filename: string;
+        lastCommittedContent: string;
+      };
+
+    if (content === lastCommittedContent) {
+      return c.json({ error: "No changes to commit" }, 409);
+    }
 
     const result = await updateGist(gistId, filename, content, token);
+
+    // Update lastCommittedContent in DO
+    await stub.fetch(
+      new URL(`/parties/gist-room/${gistId}/committed`, c.req.url).toString(),
+      { method: "POST", body: content }
+    );
+
     return c.json(result);
   } catch {
     return c.json({ error: "Commit failed" }, 502);

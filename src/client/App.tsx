@@ -11,6 +11,7 @@ export default function App() {
   const { data: session } = useSession();
   const [showPreview, setShowPreview] = useState(false);
   const [committing, setCommitting] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     const onPopState = () => setRoute(parseRoute(window.location.pathname));
@@ -19,20 +20,22 @@ export default function App() {
   }, []);
 
   const handleCommit = useCallback(async () => {
-    if (!session || committing) return;
+    if (!session || committing || !hasChanges) return;
     setCommitting(true);
     try {
       const res = await fetch(`/api/gists/${route.gistId}/commit`, {
         method: "POST",
         credentials: "include",
       });
+      if (res.status === 409) return; // no changes
       if (!res.ok) throw new Error(`Commit failed: ${res.status}`);
+      setHasChanges(false);
     } catch (e) {
       console.error("Commit error:", e);
     } finally {
       setCommitting(false);
     }
-  }, [session, committing, route.gistId]);
+  }, [session, committing, hasChanges, route.gistId]);
 
   // Global Ctrl+S / Cmd+S → commit
   useEffect(() => {
@@ -56,6 +59,7 @@ export default function App() {
         onTogglePreview={() => setShowPreview((p) => !p)}
         onCommit={handleCommit}
         committing={committing}
+        hasChanges={hasChanges}
       />
       <EditorPage
         key={route.gistId}
@@ -63,6 +67,7 @@ export default function App() {
         session={session}
         showPreview={showPreview}
         onCommit={handleCommit}
+        onDirtyChange={setHasChanges}
       />
     </div>
   );

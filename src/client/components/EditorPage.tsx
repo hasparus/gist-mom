@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import YPartyKitProvider from "y-partyserver/provider";
 import * as Y from "yjs";
 import { Editor } from "./Editor";
@@ -24,17 +24,20 @@ export function EditorPage({
   session,
   showPreview,
   onCommit,
+  onDirtyChange,
 }: {
   gistId: string;
   session: Session;
   showPreview: boolean;
   onCommit: () => void;
+  onDirtyChange: (dirty: boolean) => void;
 }) {
   const [collab, setCollab] = useState<{
     provider: YPartyKitProvider;
     ydoc: Y.Doc;
   } | null>(null);
   const [content, setContent] = useState("");
+  const baselineRef = useRef<string | null>(null);
 
   useEffect(() => {
     const doc = new Y.Doc();
@@ -50,21 +53,38 @@ export function EditorPage({
       colorLight: color + "33",
     });
 
+    // Capture baseline content after initial sync
+    const onSync = (synced: boolean) => {
+      if (synced && baselineRef.current === null) {
+        baselineRef.current = doc.getText("content").toString();
+      }
+    };
+    p.on("sync", onSync);
+
     setCollab({ provider: p, ydoc: doc });
     return () => {
+      p.off("sync", onSync);
       p.destroy();
       doc.destroy();
+      baselineRef.current = null;
+      onDirtyChange(false);
     };
   }, [gistId]);
 
-  // Track content for preview
+  // Track content for preview + dirty state
   useEffect(() => {
     if (!collab) return;
     const ytext = collab.ydoc.getText("content");
-    const observer = () => setContent(ytext.toString());
+    const observer = () => {
+      const current = ytext.toString();
+      setContent(current);
+      if (baselineRef.current !== null) {
+        onDirtyChange(current !== baselineRef.current);
+      }
+    };
     ytext.observe(observer);
     return () => ytext.unobserve(observer);
-  }, [collab]);
+  }, [collab, onDirtyChange]);
 
   return (
     <div className="flex-1 flex overflow-hidden justify-center">

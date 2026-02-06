@@ -1,11 +1,60 @@
 import { useEffect, useRef } from "react";
-import { EditorView, basicSetup } from "codemirror";
+import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
-import { keymap } from "@codemirror/view";
+import {
+  keymap,
+  highlightSpecialChars,
+  drawSelection,
+  dropCursor,
+  rectangularSelection,
+  crosshairCursor,
+} from "@codemirror/view";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import {
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
+  syntaxHighlighting,
+  defaultHighlightStyle,
+} from "@codemirror/language";
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+} from "@codemirror/autocomplete";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { markdown } from "@codemirror/lang-markdown";
 import { yCollab, yUndoManagerKeymap } from "y-codemirror.next";
 import type * as Y from "yjs";
 import type { Awareness } from "y-protocols/awareness";
+
+// basicSetup minus lineNumbers and highlightActiveLine
+const minimalSetup = [
+  highlightSpecialChars(),
+  history(),
+  foldGutter(),
+  drawSelection(),
+  dropCursor(),
+  EditorState.allowMultipleSelections.of(true),
+  indentOnInput(),
+  syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+  bracketMatching(),
+  closeBrackets(),
+  autocompletion(),
+  rectangularSelection(),
+  crosshairCursor(),
+  highlightSelectionMatches(),
+  keymap.of([
+    ...closeBracketsKeymap,
+    ...defaultKeymap,
+    ...searchKeymap,
+    ...historyKeymap,
+    ...foldKeymap,
+    ...completionKeymap,
+  ]),
+];
 
 interface EditorProps {
   ytext: Y.Text;
@@ -25,7 +74,7 @@ export function Editor({ ytext, awareness, onCommit }: EditorProps) {
     const state = EditorState.create({
       doc: ytext.toString(),
       extensions: [
-        basicSetup,
+        minimalSetup,
         markdown(),
         EditorView.lineWrapping,
         keymap.of([

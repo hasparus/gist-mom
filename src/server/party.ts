@@ -6,6 +6,7 @@ const STORAGE_KEY = "ydoc-state";
 
 export class GistRoom extends YjsDocument<Env> {
   private gistMeta: { filename: string } | null = null;
+  private lastCommittedContent: string = "";
 
   override async onLoad() {
     // Restore Y.Doc state from DO storage
@@ -31,6 +32,7 @@ export class GistRoom extends YjsDocument<Env> {
       if (files.length > 0) {
         const file = files[0]!;
         this.gistMeta = { filename: file.filename };
+        this.lastCommittedContent = file.content;
         const ytext = this.document.getText("content");
         if (ytext.length === 0) {
           ytext.insert(0, file.content);
@@ -44,10 +46,17 @@ export class GistRoom extends YjsDocument<Env> {
   override async onRequest(request: Request): Promise<Response> {
     const pathname = new URL(request.url).pathname;
 
+    // POST /committed — update baseline after successful commit
+    if (request.method === "POST" && pathname.endsWith("/committed")) {
+      this.lastCommittedContent = await request.text();
+      return new Response("ok");
+    }
+
     if (request.method === "GET" && pathname.endsWith("/content")) {
       return Response.json({
         content: this.document.getText("content").toString(),
         filename: this.gistMeta?.filename || "file.md",
+        lastCommittedContent: this.lastCommittedContent,
       });
     }
 
