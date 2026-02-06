@@ -3,7 +3,7 @@ import { cors } from "hono/cors";
 import { routePartykitRequest } from "partyserver";
 import { createAuth } from "./auth";
 import { GistRoom } from "./party";
-import { createGist, updateGist } from "./github";
+import { createGist, fetchGist, GitHubApiError, updateGist } from "./github";
 
 export { GistRoom };
 
@@ -35,6 +35,49 @@ async function getGitHubToken(env: Env, headers: Headers) {
     .first<{ accessToken: string }>();
   return row?.accessToken ?? null;
 }
+
+app.get("/api/gists/:id", async (c) => {
+  const token = await getGitHubToken(c.env, c.req.raw.headers);
+  const gistId = c.req.param("id");
+
+  try {
+    const gist = await fetchGist(gistId, token ?? undefined);
+    const files = Object.values(gist.files);
+    if (files.length > 0) {
+      const file = files[0]!;
+      // Seed the DO with the gist content (no-op if already populated)
+      const doId = c.env.GistRoom.idFromName(gistId);
+      const stub = c.env.GistRoom.get(doId);
+      await stub.fetch(
+        new URL(`/parties/gist-room/${gistId}/seed`, c.req.url).toString(),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: file.filename,
+            content: file.content,
+          }),
+        }
+      );
+    }
+    return c.json({
+      id: gist.id,
+      description: gist.description,
+      owner: gist.owner,
+      files: Object.fromEntries(
+        Object.entries(gist.files).map(([k, v]) => [
+          k,
+          { filename: v.filename },
+        ])
+      ),
+    });
+  } catch (e) {
+    if (e instanceof GitHubApiError) {
+      return c.json({ error: e.message }, e.status as 403 | 404);
+    }
+    return c.json({ error: "Failed to fetch gist" }, 502);
+  }
+});
 
 app.post("/api/gists/:id/commit", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);

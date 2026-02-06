@@ -4,6 +4,7 @@ import { GitHubIcon } from "./icons";
 import type { Session } from "../lib/types";
 import { UserProfileMenu } from "./UserProfileMenu";
 import { Button } from "./ui/button";
+import { SidebarTrigger } from "./ui/sidebar";
 
 export function Navbar({
   session,
@@ -27,6 +28,7 @@ export function Navbar({
   return (
     <nav className="flex items-center gap-2 h-11 border-b border-border shrink-0">
       <div className="flex items-center gap-2 w-full max-w-4xl mx-auto px-2">
+        {session && <SidebarTrigger />}
         <div className="flex items-center gap-1">
           <a
             href="/"

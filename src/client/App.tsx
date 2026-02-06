@@ -3,6 +3,8 @@ import { parseRoute, type Route } from "./lib/router";
 import { useSession } from "./lib/auth-client";
 import { Navbar } from "./components/Navbar";
 import { EditorPage } from "./components/EditorPage";
+import { GistSidebar } from "./components/GistSidebar";
+import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 
 export default function App() {
   const [route, setRoute] = useState<Route>(() =>
@@ -50,25 +52,28 @@ export default function App() {
   }, [handleCommit]);
 
   return (
-    <div className="flex flex-col h-dvh">
-      <Navbar
-        session={session}
-        user={route.user}
-        gistId={route.gistId}
-        showPreview={showPreview}
-        onTogglePreview={() => setShowPreview((p) => !p)}
-        onCommit={handleCommit}
-        committing={committing}
-        hasChanges={hasChanges}
-      />
-      <EditorPage
-        key={route.gistId}
-        gistId={route.gistId}
-        session={session}
-        showPreview={showPreview}
-        onCommit={handleCommit}
-        onDirtyChange={setHasChanges}
-      />
-    </div>
+    <SidebarProvider defaultOpen={false}>
+      <GistSidebar session={session} currentGistId={route.gistId} />
+      <SidebarInset className="h-dvh">
+        <Navbar
+          session={session}
+          user={route.user}
+          gistId={route.gistId}
+          showPreview={showPreview}
+          onTogglePreview={() => setShowPreview((p) => !p)}
+          onCommit={handleCommit}
+          committing={committing}
+          hasChanges={hasChanges}
+        />
+        <EditorPage
+          key={route.gistId}
+          gistId={route.gistId}
+          session={session}
+          showPreview={showPreview}
+          onCommit={handleCommit}
+          onDirtyChange={setHasChanges}
+        />
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

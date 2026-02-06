@@ -1,3 +1,9 @@
+export class GitHubApiError extends Error {
+  constructor(public status: number) {
+    super(`GitHub API ${status}`);
+  }
+}
+
 export async function fetchGist(gistId: string, token?: string) {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
@@ -7,7 +13,7 @@ export async function fetchGist(gistId: string, token?: string) {
   const res = await fetch(`https://api.github.com/gists/${gistId}`, {
     headers,
   });
-  if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+  if (!res.ok) throw new GitHubApiError(res.status);
   return res.json() as Promise<{
     id: string;
     files: Record<string, { filename: string; content: string }>;
@@ -43,7 +49,7 @@ export async function createGist(
       },
     }),
   });
-  if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+  if (!res.ok) throw new GitHubApiError(res.status);
   return res.json() as Promise<{
     id: string;
     files: Record<string, { filename: string; content: string }>;
@@ -70,6 +76,6 @@ export async function updateGist(
       files: { [filename]: { content } },
     }),
   });
-  if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+  if (!res.ok) throw new GitHubApiError(res.status);
   return res.json();
 }

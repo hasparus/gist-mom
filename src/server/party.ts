@@ -1,6 +1,5 @@
 import { YjsDocument } from "y-partyserver";
 import * as Y from "yjs";
-import { fetchGist } from "./github";
 
 const STORAGE_KEY = "ydoc-state";
 
@@ -22,35 +21,15 @@ export class GistRoom extends YjsDocument<Env> {
     await this.ctx.storage.put(STORAGE_KEY, state.buffer);
   }
 
-  override async onStart() {
-    await super.onStart(); // calls onLoad()
-
-    const gistId = this.name;
-    const ytext = this.document.getText("content");
-
-    // Skip GitHub fetch if we already have content from DO storage
-    if (ytext.length > 0) return;
-
-    try {
-      const gist = await fetchGist(gistId);
-      const files = Object.values(gist.files);
-      if (files.length > 0) {
-        const file = files[0]!;
-        this.gistMeta = { filename: file.filename };
-        this.lastCommittedContent = file.content;
-        ytext.insert(0, file.content);
-      }
-    } catch (e) {
-      console.error("Failed to load gist:", e);
-    }
-  }
-
   override async onRequest(request: Request): Promise<Response> {
     const pathname = new URL(request.url).pathname;
 
     // POST /committed — update baseline after successful commit
     if (request.method === "POST" && pathname.endsWith("/committed")) {
       this.lastCommittedContent = await request.text();
+      // Broadcast to all clients via Y.js so they can update dirty state
+      const meta = this.document.getMap("meta");
+      meta.set("commitVersion", ((meta.get("commitVersion") as number) || 0) + 1);
       return new Response("ok");
     }
 
@@ -60,6 +39,23 @@ export class GistRoom extends YjsDocument<Env> {
         filename: this.gistMeta?.filename || "file.md",
         lastCommittedContent: this.lastCommittedContent,
       });
+    }
+
+    // POST /seed — populate Y.Doc with initial gist content (only if empty)
+    if (request.method === "POST" && pathname.endsWith("/seed")) {
+      const ytext = this.document.getText("content");
+      if (ytext.length === 0) {
+        const { filename, content } = (await request.json()) as {
+          filename: string;
+          content: string;
+        };
+        this.gistMeta = { filename };
+        this.lastCommittedContent = content;
+        ytext.insert(0, content);
+        const meta = this.document.getMap("meta");
+        meta.set("commitVersion", 1);
+      }
+      return new Response("ok");
     }
 
     return super.onRequest(request);

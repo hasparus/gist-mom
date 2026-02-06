@@ -13,21 +13,20 @@
 
 ## P1 — Social & Navigation
 
-- [ ] Commit and init Shadcn
+- [x] Commit and init Shadcn (is this already done? double check)
   ```
-  bunx --bun shadcn@latest create --preset "https://ui.shadcn.com/init?base=base&style=mira&baseColor=neutral&theme=neutral&iconLibrary=remixicon&font=inter&menuAccent=bold&menuColor=default&radius=small&template=vite&rtl=false" --template vite
+  bunx --bun shadcn@latest create --preset "https://ui.shadcn.com/init?base=radix&style=mira&baseColor=neutral&theme=neutral&iconLibrary=remixicon&font=inter&menuAccent=bold&menuColor=default&radius=small&template=vite&rtl=false" --template vite
   ```
-- [ ] Sidebar: Show authed user's Gist in the left sidebar. Sidebar should be foldable
+- [x] Sidebar: Show authed user's Gist in the left sidebar. Sidebar should be foldable
   - Use Sidebar (Floating) from Shadcn
-- [ ] Use dropdown-menu-avatar.tsx with shadcn DropdownMenu to uplif our UserProfileMenu
-- [ ] CodeMirror Line numbers must be hidden.
-- [ ] The app should be `max-w-[800px] mx-auto`. Dropbox Paper style centered UI.
+- [x] CodeMirror Line numbers must be hidden.
+- [x] The app should be `max-w-[800px] mx-auto`. Dropbox Paper style centered UI.
 - [ ] PresenceAvatars: Show all users in the Yjs session.
 - [ ] Gist commits — show commit history panel (GET /gists/{id}/commits)
 - [ ] Gist forks — show forks list (GET /gists/{id}/forks)
 - [ ] Fork gist — fork button (POST /gists/{id}/forks)
 - [ ] Star/unstar — star toggle (PUT/DELETE /gists/{id}/star)
-- [ ] GitHub link — rightmost navbar icon, opens gist on github.com
+- [ ] GitHub link — bottom right icon, opens gist-mom GitHub repo
 - [ ] Cursor Party — same setup as in ~/workspace/mageworld
 
 Crucial: Add end-to-end tests for all of that.

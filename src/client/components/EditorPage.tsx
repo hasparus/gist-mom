@@ -3,6 +3,7 @@ import YPartyKitProvider from "y-partyserver/provider";
 import * as Y from "yjs";
 import { Editor } from "./Editor";
 import { Preview } from "./Preview";
+import { signIn } from "../lib/auth-client";
 import type { Session } from "../lib/types";
 
 function randomColor() {
@@ -37,9 +38,41 @@ export function EditorPage({
     ydoc: Y.Doc;
   } | null>(null);
   const [content, setContent] = useState("");
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [seeded, setSeeded] = useState(false);
   const baselineRef = useRef<string | null>(null);
 
+  // Fetch gist via API (seeds DO + validates access)
   useEffect(() => {
+    const ac = new AbortController();
+    setFetchError(null);
+    setSeeded(false);
+    fetch(`/api/gists/${gistId}`, {
+      credentials: "include",
+      signal: ac.signal,
+    }).then(
+      async (res) => {
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          setFetchError(
+            (body as { error?: string }).error ||
+              `Failed to load gist (${res.status})`
+          );
+        } else {
+          setSeeded(true);
+        }
+      },
+      (err) => {
+        if (!ac.signal.aborted) setFetchError(String(err));
+      }
+    );
+    return () => ac.abort();
+  }, [gistId]);
+
+  // Connect WebSocket only after the DO has been seeded
+  useEffect(() => {
+    if (!seeded) return;
+
     const doc = new Y.Doc();
     const p = new YPartyKitProvider(window.location.host, gistId, doc, {
       connect: true,
@@ -53,23 +86,31 @@ export function EditorPage({
       colorLight: color + "33",
     });
 
-    // Capture baseline content after initial sync
-    const onSync = (synced: boolean) => {
-      if (synced && baselineRef.current === null) {
-        baselineRef.current = doc.getText("content").toString();
-      }
-    };
-    p.on("sync", onSync);
-
     setCollab({ provider: p, ydoc: doc });
     return () => {
-      p.off("sync", onSync);
       p.destroy();
       doc.destroy();
+      setCollab(null);
       baselineRef.current = null;
       onDirtyChange(false);
     };
-  }, [gistId]);
+  }, [gistId, seeded]);
+
+  // When commitVersion changes (local or remote commit), reset baseline
+  useEffect(() => {
+    if (!collab) return;
+    const meta = collab.ydoc.getMap("meta");
+    const observer = () => {
+      if (typeof meta.get("commitVersion") === "number") {
+        baselineRef.current = collab.ydoc.getText("content").toString();
+        onDirtyChange(false);
+      }
+    };
+    meta.observe(observer);
+    // Check initial value (may already be set from sync)
+    observer();
+    return () => meta.unobserve(observer);
+  }, [collab, onDirtyChange]);
 
   // Track content for preview + dirty state
   useEffect(() => {
@@ -85,6 +126,34 @@ export function EditorPage({
     ytext.observe(observer);
     return () => ytext.unobserve(observer);
   }, [collab, onDirtyChange]);
+
+  if (fetchError) {
+    const isRateLimit = fetchError.includes("403");
+    return (
+      <div className="flex-1 flex overflow-hidden justify-center">
+        <div className="max-w-4xl w-full px-4 pt-4 space-y-2">
+          <p className="text-destructive font-medium">
+            Could not load this gist
+          </p>
+          <p className="text-sm text-muted-foreground">{fetchError}</p>
+          {isRateLimit && !session && (
+            <>
+              <p className="text-sm text-muted-foreground">
+                GitHub rate-limits unauthenticated API requests. Sign in to fix
+                this.
+              </p>
+              <button
+                className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:bg-primary/90"
+                onClick={() => signIn.social({ provider: "github" })}
+              >
+                Sign in with GitHub
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex overflow-hidden justify-center">
