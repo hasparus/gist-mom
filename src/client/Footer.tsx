@@ -5,7 +5,7 @@ export function Footer({ children }: { children: React.ReactNode }) {
   return (
     <footer className="flex min-h-11 shrink-0 items-center justify-center gap-2 border-t border-border px-3 py-1.5 text-xs text-muted-foreground flex-wrap">
       {children}
-      <span className="flex items-center gap-x-2 gap-y-0.5 ml-auto flex-wrap justify-start sm:justify-end">
+      <span className="flex items-center gap-x-2 gap-y-0.5 flex-wrap">
         <span>
           built by{" "}
           <a
