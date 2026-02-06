@@ -30,9 +30,9 @@ test("preview split view", async ({ page }) => {
   await expect(page.locator(".preview")).not.toBeVisible();
 });
 
-test("commit button visible", async ({ page }) => {
+test("save button visible", async ({ page }) => {
   await page.goto("/hasparus/a8390723cd893a21db00beba580fca36");
   await expect(
-    page.locator("button", { hasText: "Commit" })
+    page.locator("button", { hasText: "Save" })
   ).toBeVisible({ timeout: 10000 });
 });

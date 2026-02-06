@@ -66,7 +66,7 @@ export function Navbar({
               onClick={onCommit}
               disabled={committing || !hasChanges}
             >
-              {committing ? "Committing..." : "Commit"}
+              {committing ? "Saving..." : "Save"}
             </Button>
             <UserProfileMenu user={session.user} />
           </>
