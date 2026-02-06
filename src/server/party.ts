@@ -21,6 +21,10 @@ export class GistRoom extends YjsDocument<Env> {
     await this.ctx.storage.put(STORAGE_KEY, state.buffer);
   }
 
+  override onError(_connection: unknown, _error: unknown) {
+    // Network disconnects are retryable — client reconnects automatically
+  }
+
   override async onRequest(request: Request): Promise<Response> {
     const pathname = new URL(request.url).pathname;
 
@@ -43,16 +47,19 @@ export class GistRoom extends YjsDocument<Env> {
 
     // POST /seed — populate Y.Doc with initial gist content (only if empty)
     if (request.method === "POST" && pathname.endsWith("/seed")) {
+      const { filename, content } = (await request.json()) as {
+        filename: string;
+        content: string;
+      };
+      this.gistMeta = { filename };
+      this.lastCommittedContent = content;
+
       const ytext = this.document.getText("content");
       if (ytext.length === 0) {
-        const { filename, content } = (await request.json()) as {
-          filename: string;
-          content: string;
-        };
-        this.gistMeta = { filename };
-        this.lastCommittedContent = content;
         ytext.insert(0, content);
-        const meta = this.document.getMap("meta");
+      }
+      const meta = this.document.getMap("meta");
+      if (!meta.has("commitVersion")) {
         meta.set("commitVersion", 1);
       }
       return new Response("ok");

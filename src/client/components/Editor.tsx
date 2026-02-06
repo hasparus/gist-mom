@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import {
@@ -90,10 +90,60 @@ export function Editor({ ytext, awareness, onCommit }: EditorProps) {
 
     viewRef.current = new EditorView({ state, parent: ref.current });
 
+    // Tell CM to remeasure when container is resized (CSS resize handle or window)
+    const ro = new ResizeObserver(() => {
+      viewRef.current?.requestMeasure();
+    });
+    ro.observe(ref.current);
+
     return () => {
+      ro.disconnect();
       viewRef.current?.destroy();
     };
   }, [ytext, awareness]);
 
-  return <div ref={ref} className="h-full [&_.cm-editor]:h-full" />;
+  const onDragHandle = useCallback((e: React.PointerEvent) => {
+    const container = ref.current?.parentElement;
+    if (!container) return;
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = container.getBoundingClientRect().width;
+    const handle = e.currentTarget as HTMLElement;
+    handle.setPointerCapture(e.pointerId);
+    handle.dataset.dragging = "";
+
+    const onMove = (ev: PointerEvent) => {
+      const w = Math.max(320, startW + ev.clientX - startX);
+      container.style.width = `${w}px`;
+      container.style.maxWidth = "none";
+      container.style.flex = "none";
+      viewRef.current?.requestMeasure();
+    };
+    const onUp = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      delete handle.dataset.dragging;
+    };
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+  }, []);
+
+  const onResetWidth = useCallback(() => {
+    const container = ref.current?.parentElement;
+    if (!container) return;
+    container.style.width = "";
+    container.style.maxWidth = "";
+    container.style.flex = "";
+    viewRef.current?.requestMeasure();
+  }, []);
+
+  return (
+    <div ref={ref} className="relative h-full [&_.cm-editor]:h-full">
+      <div
+        onPointerDown={onDragHandle}
+        onDoubleClick={onResetWidth}
+        className="hidden xl:block absolute right-0 top-0 bottom-0 w-3 cursor-col-resize z-10 border-r border-dashed border-border hover:border-solid hover:border-r-2 data-[dragging]:border-solid data-[dragging]:border-r-2"
+      />
+    </div>
+  );
 }

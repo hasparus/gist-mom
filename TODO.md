@@ -21,12 +21,12 @@
   - Use Sidebar (Floating) from Shadcn
 - [x] CodeMirror Line numbers must be hidden.
 - [x] The app should be `max-w-[800px] mx-auto`. Dropbox Paper style centered UI.
-- [ ] PresenceAvatars: Show all users in the Yjs session.
+- [x] PresenceAvatars: Show all users in the Yjs session.
 - [ ] Gist commits — show commit history panel (GET /gists/{id}/commits)
 - [ ] Gist forks — show forks list (GET /gists/{id}/forks)
 - [ ] Fork gist — fork button (POST /gists/{id}/forks)
 - [ ] Star/unstar — star toggle (PUT/DELETE /gists/{id}/star)
 - [ ] GitHub link — bottom right icon, opens gist-mom GitHub repo
-- [ ] Cursor Party — same setup as in ~/workspace/mageworld
+- [x] Cursor Party — same setup as in ~/workspace/mageworld
 
 Crucial: Add end-to-end tests for all of that.

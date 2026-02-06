@@ -6,6 +6,8 @@ import { UserProfileMenu } from "./UserProfileMenu";
 import { Button } from "./ui/button";
 import { SidebarTrigger } from "./ui/sidebar";
 
+type SaveStatus = "idle" | "saving" | "saved" | "failed";
+
 export function Navbar({
   session,
   user,
@@ -13,7 +15,7 @@ export function Navbar({
   showPreview,
   onTogglePreview,
   onCommit,
-  committing,
+  saveStatus,
   hasChanges,
   onPrefetchGists,
 }: {
@@ -23,7 +25,7 @@ export function Navbar({
   showPreview: boolean;
   onTogglePreview: () => void;
   onCommit: () => void;
-  committing: boolean;
+  saveStatus: SaveStatus;
   hasChanges: boolean;
   onPrefetchGists?: () => void;
 }) {
@@ -71,14 +73,21 @@ export function Navbar({
         {session ? (
           <>
             <span
-              title={!hasChanges && !committing ? "No changes yet" : undefined}
+              title={!hasChanges && saveStatus === "idle" ? "No changes yet" : undefined}
             >
               <Button
                 size="sm"
+                variant={saveStatus === "failed" ? "destructive" : "default"}
                 onClick={onCommit}
-                disabled={committing || !hasChanges}
+                disabled={saveStatus === "saving" || saveStatus === "saved" || !hasChanges}
               >
-                {committing ? "Saving..." : "Save"}
+                {saveStatus === "saving"
+                  ? "Saving\u2026"
+                  : saveStatus === "saved"
+                    ? "Saved \u2713"
+                    : saveStatus === "failed"
+                      ? "Failed"
+                      : "Save"}
               </Button>
             </span>
             <UserProfileMenu user={session.user} />

@@ -3,8 +3,10 @@ import YPartyKitProvider from "y-partyserver/provider";
 import * as Y from "yjs";
 import { Editor } from "./Editor";
 import { Preview } from "./Preview";
+import { CursorParty } from "./CursorParty";
 import { signIn } from "../lib/auth-client";
 import type { Session } from "../lib/types";
+import type { Peer } from "./PresenceAvatars";
 
 function randomColor() {
   const colors = [
@@ -26,12 +28,14 @@ export function EditorPage({
   showPreview,
   onCommit,
   onDirtyChange,
+  onPeersChange,
 }: {
   gistId: string;
   session: Session;
   showPreview: boolean;
   onCommit: () => void;
   onDirtyChange: (dirty: boolean) => void;
+  onPeersChange: (peers: Peer[]) => void;
 }) {
   const [collab, setCollab] = useState<{
     provider: YPartyKitProvider;
@@ -84,6 +88,7 @@ export function EditorPage({
       name: session?.user?.name || "Anonymous",
       color,
       colorLight: color + "33",
+      image: session?.user?.image || null,
     });
 
     setCollab({ provider: p, ydoc: doc });
@@ -127,6 +132,36 @@ export function EditorPage({
     return () => ytext.unobserve(observer);
   }, [collab, onDirtyChange]);
 
+  // Report connected peers to parent
+  useEffect(() => {
+    if (!collab) {
+      onPeersChange([]);
+      return;
+    }
+    const awareness = collab.provider.awareness;
+    const report = () => {
+      const peers: Peer[] = [];
+      awareness.getStates().forEach((state, clientId) => {
+        if (clientId === awareness.clientID) return;
+        const user = state.user as
+          | { name?: string; color?: string; image?: string | null }
+          | undefined;
+        if (!user) return;
+        peers.push({
+          name: user.name || "Anonymous",
+          color: user.color || "#888",
+          image: user.image,
+        });
+      });
+      onPeersChange(peers);
+    };
+    awareness.on("change", report);
+    report();
+    return () => {
+      awareness.off("change", report);
+    };
+  }, [collab, onPeersChange]);
+
   if (fetchError) {
     const isRateLimit = fetchError.includes("403");
     return (
@@ -158,10 +193,10 @@ export function EditorPage({
   return (
     <div className="flex-1 flex overflow-hidden justify-center">
       {!collab ? (
-        <div className="max-w-4xl w-full px-4 pt-4 text-muted-foreground">Connecting...</div>
+        <div className="max-w-4xl w-full pl-2 pr-4 pt-4 text-sm text-muted-foreground">Connecting...</div>
       ) : (
         <>
-          <div className="flex-1 overflow-auto max-w-4xl px-0.5 xl:resize-x xl:min-w-[32rem]">
+          <div className="flex-1 overflow-auto max-w-4xl px-0.5">
             <Editor
               ytext={collab.ydoc.getText("content")}
               awareness={collab.provider.awareness}
@@ -173,6 +208,7 @@ export function EditorPage({
               <Preview content={content} />
             </div>
           )}
+          <CursorParty awareness={collab.provider.awareness} />
         </>
       )}
     </div>

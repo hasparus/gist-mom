@@ -19,15 +19,6 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src/client"),
     },
   },
-  environments: {
-    client: {
-      build: {
-        rollupOptions: {
-          input: path.resolve(__dirname, "index.html"),
-        },
-      },
-    },
-  },
   server: {
     port: 1999,
   },

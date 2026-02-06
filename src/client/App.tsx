@@ -2,20 +2,31 @@ import { useState, useEffect, useCallback } from "react";
 import { parseRoute, type Route } from "./lib/router";
 import { useSession } from "./lib/auth-client";
 import { useGists } from "./lib/use-gists";
+import { PresenceAvatars, type Peer } from "./components/PresenceAvatars";
 import { Navbar } from "./components/Navbar";
 import { EditorPage } from "./components/EditorPage";
 import { GistSidebar } from "./components/GistSidebar";
 import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 
+import { Footer } from "./Footer";
+
 export default function App() {
   const [route, setRoute] = useState<Route>(() =>
-    parseRoute(window.location.pathname)
+    parseRoute(window.location.pathname),
   );
   const { data: session } = useSession();
-  const { gists, loading: gistsLoading, error: gistsError, prefetch: prefetchGists } = useGists();
+  const {
+    gists,
+    loading: gistsLoading,
+    error: gistsError,
+    prefetch: prefetchGists,
+  } = useGists();
   const [showPreview, setShowPreview] = useState(false);
-  const [committing, setCommitting] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "saving" | "saved" | "failed"
+  >("idle");
   const [hasChanges, setHasChanges] = useState(false);
+  const [peers, setPeers] = useState<Peer[]>([]);
 
   useEffect(() => {
     const onPopState = () => setRoute(parseRoute(window.location.pathname));
@@ -24,22 +35,27 @@ export default function App() {
   }, []);
 
   const handleCommit = useCallback(async () => {
-    if (!session || committing || !hasChanges) return;
-    setCommitting(true);
+    if (!session || saveStatus === "saving" || !hasChanges) return;
+    setSaveStatus("saving");
     try {
       const res = await fetch(`/api/gists/${route.gistId}/commit`, {
         method: "POST",
         credentials: "include",
       });
-      if (res.status === 409) return; // no changes
+      if (res.status === 409) {
+        setSaveStatus("idle");
+        return;
+      }
       if (!res.ok) throw new Error(`Commit failed: ${res.status}`);
       setHasChanges(false);
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 2000);
     } catch (e) {
       console.error("Commit error:", e);
-    } finally {
-      setCommitting(false);
+      setSaveStatus("failed");
+      setTimeout(() => setSaveStatus("idle"), 2000);
     }
-  }, [session, committing, hasChanges, route.gistId]);
+  }, [session, saveStatus, hasChanges, route.gistId]);
 
   // Global Ctrl+S / Cmd+S → commit
   useEffect(() => {
@@ -70,7 +86,7 @@ export default function App() {
           showPreview={showPreview}
           onTogglePreview={() => setShowPreview((p) => !p)}
           onCommit={handleCommit}
-          committing={committing}
+          saveStatus={saveStatus}
           hasChanges={hasChanges}
           onPrefetchGists={prefetchGists}
         />
@@ -81,7 +97,11 @@ export default function App() {
           showPreview={showPreview}
           onCommit={handleCommit}
           onDirtyChange={setHasChanges}
+          onPeersChange={setPeers}
         />
+        <Footer>
+          <PresenceAvatars peers={peers} />
+        </Footer>
       </SidebarInset>
     </SidebarProvider>
   );
