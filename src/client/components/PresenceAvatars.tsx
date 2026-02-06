@@ -30,8 +30,8 @@ export function PresenceAvatars({ peers }: { peers: Peer[] }) {
   return (
     <TooltipProvider delayDuration={200}>
       <AvatarGroup>
-        {visible.map((peer, i) => (
-          <Tooltip key={i}>
+        {visible.map((peer) => (
+          <Tooltip key={`${peer.name}-${peer.color}`}>
             <TooltipTrigger asChild>
               <Avatar
                 size="sm"

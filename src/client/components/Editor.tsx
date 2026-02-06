@@ -137,12 +137,39 @@ export function Editor({ ytext, awareness, onCommit }: EditorProps) {
     viewRef.current?.requestMeasure();
   }, []);
 
+  const onHandleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const container = ref.current?.parentElement;
+      if (!container) return;
+      const step = e.shiftKey ? 50 : 10;
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        e.preventDefault();
+        const current = container.getBoundingClientRect().width;
+        const delta = e.key === "ArrowRight" ? step : -step;
+        const w = Math.max(320, current + delta);
+        container.style.width = `${w}px`;
+        container.style.maxWidth = "none";
+        container.style.flex = "none";
+        viewRef.current?.requestMeasure();
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        onResetWidth();
+      }
+    },
+    [onResetWidth],
+  );
+
   return (
     <div ref={ref} className="relative h-full [&_.cm-editor]:h-full">
       <div
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize editor"
+        tabIndex={0}
         onPointerDown={onDragHandle}
         onDoubleClick={onResetWidth}
-        className="hidden xl:block absolute right-0 top-0 bottom-0 w-3 cursor-col-resize z-10 border-r border-dashed border-border hover:border-solid hover:border-r-2 data-[dragging]:border-solid data-[dragging]:border-r-2"
+        onKeyDown={onHandleKeyDown}
+        className="hidden xl:block absolute right-0 top-0 bottom-0 w-3 cursor-col-resize z-10 border-r border-dashed border-border hover:border-solid hover:border-r-2 data-[dragging]:border-solid data-[dragging]:border-r-2 focus-visible:border-solid focus-visible:border-r-2 focus-visible:border-ring"
       />
     </div>
   );

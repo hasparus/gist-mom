@@ -13,15 +13,15 @@ class_name = "GistRoom"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["GistRoom"]
+new_sqlite_classes = ["GistRoom"]
 
 [[d1_databases]]
 binding = "DATABASE"
 database_name = "gist-mom-auth"
-database_id = "local"
+database_id = "5188c070-8484-429e-bf99-ca1b32c9a404"
 
 [vars]
-GITHUB_CLIENT_ID = "Ov23liWqVF5OFktFycCL"
+GITHUB_CLIENT_ID = "Ov23lilf4Aq9AlPahXJW"
 
 [dev]
 ip = "127.0.0.1"

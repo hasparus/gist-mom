@@ -3,7 +3,13 @@ import { cors } from "hono/cors";
 import { routePartykitRequest } from "partyserver";
 import { createAuth } from "./auth";
 import { GistRoom } from "./party";
-import { createGist, fetchGist, GitHubApiError, updateGist } from "./github";
+import {
+  createGist,
+  fetchGist,
+  fetchGistCommits,
+  GitHubApiError,
+  updateGist,
+} from "./github";
 
 export { GistRoom };
 
@@ -86,6 +92,20 @@ app.get("/api/gists/:id", async (c) => {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("GET /api/gists/:id error:", msg);
     return c.json({ error: msg }, 502);
+  }
+});
+
+app.get("/api/gists/:id/commits", async (c) => {
+  const token = await getGitHubToken(c.env, c.req.raw.headers);
+  const gistId = c.req.param("id");
+  try {
+    const commits = await fetchGistCommits(gistId, token ?? undefined);
+    return c.json(commits);
+  } catch (e) {
+    if (e instanceof GitHubApiError) {
+      return c.json({ error: e.message }, e.status as 403 | 404);
+    }
+    return c.json({ error: "GitHub API error" }, 502);
   }
 });
 

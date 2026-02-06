@@ -5,6 +5,7 @@ import { Editor } from "./Editor";
 import { Preview } from "./Preview";
 import { CursorParty } from "./CursorParty";
 import { signIn } from "../lib/auth-client";
+import { Button } from "./ui/button";
 import type { Session } from "../lib/types";
 import type { Peer } from "./PresenceAvatars";
 
@@ -167,8 +168,8 @@ export function EditorPage({
     return (
       <div className="flex-1 flex overflow-hidden justify-center">
         <div className="max-w-4xl w-full px-4 pt-4 space-y-2">
-          <p className="text-destructive font-medium">
-            Could not load this gist
+          <p className="text-destructive font-medium" role="alert">
+            <span aria-hidden="true">&#x26A0;&#xFE0F; </span>Could not load this gist
           </p>
           <p className="text-sm text-muted-foreground">{fetchError}</p>
           {isRateLimit && !session && (
@@ -177,12 +178,12 @@ export function EditorPage({
                 GitHub rate-limits unauthenticated API requests. Sign in to fix
                 this.
               </p>
-              <button
-                className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:bg-primary/90"
+              <Button
+                size="sm"
                 onClick={() => signIn.social({ provider: "github" })}
               >
                 Sign in with GitHub
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -193,7 +194,7 @@ export function EditorPage({
   return (
     <div className="flex-1 flex overflow-hidden justify-center">
       {!collab ? (
-        <div className="max-w-4xl w-full pl-2 pr-4 pt-4 text-sm text-muted-foreground">Connecting...</div>
+        <div role="status" aria-live="polite" className="max-w-4xl w-full pl-2 pr-4 pt-4 text-sm text-muted-foreground">Connecting...</div>
       ) : (
         <>
           <div className="flex-1 overflow-auto max-w-4xl px-0.5">

@@ -113,7 +113,7 @@
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
     --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
+    --popover: oklch(0.205 0.004 75);
     --popover-foreground: oklch(0.985 0 0);
     --primary: oklch(0.922 0 0);
     --primary-foreground: oklch(0.205 0 0);
@@ -281,7 +281,7 @@
 
 /* Reset global border/outline bleeding into CM internals */
 .cm-editor,
-.cm-editor * {
+.cm-editor *:not(:focus-visible) {
   border-color: transparent;
   outline-color: transparent;
 }

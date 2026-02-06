@@ -58,6 +58,30 @@ export async function createGist(
   }>;
 }
 
+export type GistCommit = {
+  version: string;
+  user: { login: string } | null;
+  committed_at: string;
+  change_status: { total: number; additions: number; deletions: number };
+};
+
+export async function fetchGistCommits(
+  gistId: string,
+  token?: string
+): Promise<GistCommit[]> {
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "gist.mom",
+  };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(
+    `https://api.github.com/gists/${gistId}/commits`,
+    { headers }
+  );
+  if (!res.ok) throw new GitHubApiError(res.status);
+  return res.json() as Promise<GistCommit[]>;
+}
+
 export async function updateGist(
   gistId: string,
   filename: string,

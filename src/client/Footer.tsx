@@ -12,7 +12,7 @@ export function Footer({ children }: { children: React.ReactNode }) {
             href="https://x.com/hasparus"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-foreground"
+            className="underline decoration-muted-foreground/30 hover:text-foreground hover:decoration-foreground/50"
           >
             @hasparus
           </a>{" "}
@@ -21,36 +21,35 @@ export function Footer({ children }: { children: React.ReactNode }) {
             href="https://yjs.dev"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-foreground"
+            className="underline decoration-muted-foreground/30 hover:text-foreground hover:decoration-foreground/50"
           >
-            Y.js
+            Y-
           </a>
-          ,{" "}
           <a
             href="https://github.com/threepointone/partyserver"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-foreground"
+            className="underline decoration-muted-foreground/30 hover:text-foreground hover:decoration-foreground/50"
           >
             PartyServer
           </a>{" "}
-          🎈 and{" "}
+          🎈 on{" "}
           <a
             href="https://www.cloudflare.com/developer-platform/products/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-foreground"
+            className="underline decoration-muted-foreground/30 hover:text-foreground hover:decoration-foreground/50"
           >
             Cloudflare
           </a>{" "}
           ☁️
         </span>
-        <span>&middot;</span>
+        <span>•</span>
         <a
           href="https://github.com/hasparus/gist-mom"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 hover:text-foreground"
+          className="inline-flex items-center gap-1 underline decoration-muted-foreground/30 hover:text-foreground hover:decoration-foreground/50"
         >
           <Suspense>
             <StarCount />

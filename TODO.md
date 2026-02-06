@@ -22,7 +22,7 @@
 - [x] CodeMirror Line numbers must be hidden.
 - [x] The app should be `max-w-[800px] mx-auto`. Dropbox Paper style centered UI.
 - [x] PresenceAvatars: Show all users in the Yjs session.
-- [ ] Gist commits — show commit history panel (GET /gists/{id}/commits)
+- [x] Gist commits — show commit history panel (GET /gists/{id}/commits)
 - [ ] Gist forks — show forks list (GET /gists/{id}/forks)
 - [ ] Fork gist — fork button (POST /gists/{id}/forks)
 - [ ] Star/unstar — star toggle (PUT/DELETE /gists/{id}/star)

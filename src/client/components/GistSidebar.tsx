@@ -1,4 +1,5 @@
-import { FileTextIcon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File01Icon } from "@hugeicons/core-free-icons";
 import { navigate } from "../lib/router";
 import type { Session } from "../lib/types";
 import type { GistSummary } from "../lib/use-gists";
@@ -79,7 +80,7 @@ export function GistSidebar({
                           navigate(`/${owner}/${g.id}`);
                         }}
                       >
-                        <FileTextIcon className="size-4 shrink-0" />
+                        <HugeiconsIcon icon={File01Icon} size={16} className="shrink-0" />
                         <span className="truncate">{gistLabel(g)}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { signOut } from "../lib/auth-client";
-import { ExternalLink, LogOut } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowUpRight01Icon, Logout01Icon } from "@hugeicons/core-free-icons";
 import { GitHubIcon } from "./icons";
 import { Button } from "./ui/button";
 import {
@@ -63,7 +64,7 @@ export function UserProfileMenu({ user }: { user: User }) {
           >
             <GitHubIcon className="size-4" />
             <span className="flex-1">GitHub profile</span>
-            <ExternalLink className="size-3 text-muted-foreground" />
+            <HugeiconsIcon icon={ArrowUpRight01Icon} size={12} className="text-muted-foreground" />
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
@@ -74,12 +75,12 @@ export function UserProfileMenu({ user }: { user: User }) {
           >
             <GitHubIcon className="size-4" />
             <span className="flex-1">Your gists</span>
-            <ExternalLink className="size-3 text-muted-foreground" />
+            <HugeiconsIcon icon={ArrowUpRight01Icon} size={12} className="text-muted-foreground" />
           </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
-          <LogOut className="size-4" />
+          <HugeiconsIcon icon={Logout01Icon} size={16} />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
