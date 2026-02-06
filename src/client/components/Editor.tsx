@@ -12,7 +12,6 @@ import {
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import {
   bracketMatching,
-  foldGutter,
   foldKeymap,
   indentOnInput,
   syntaxHighlighting,
@@ -34,7 +33,6 @@ import type { Awareness } from "y-protocols/awareness";
 const minimalSetup = [
   highlightSpecialChars(),
   history(),
-  foldGutter(),
   drawSelection(),
   dropCursor(),
   EditorState.allowMultipleSelections.of(true),
