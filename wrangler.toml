@@ -2,7 +2,10 @@ name = "gist-mom"
 main = "src/server/index.ts"
 compatibility_date = "2025-03-01"
 compatibility_flags = ["nodejs_compat"]
-assets = { directory = "dist", binding = "ASSETS" }
+
+[assets]
+not_found_handling = "single-page-application"
+binding = "ASSETS"
 
 [[durable_objects.bindings]]
 name = "GistRoom"
@@ -19,9 +22,6 @@ database_id = "local"
 
 [vars]
 GITHUB_CLIENT_ID = "Ov23liWqVF5OFktFycCL"
-
-[build]
-watch_dir = "src/server"
 
 [dev]
 ip = "127.0.0.1"

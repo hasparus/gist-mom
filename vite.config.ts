@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
 import path from "path";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     tailwindcss(),
@@ -12,12 +12,8 @@ export default defineConfig({
         plugins: [["babel-plugin-react-compiler"]],
       },
     }),
+    cloudflare(),
   ],
-  build: {
-    outDir: "../../dist",
-    emptyOutDir: true,
-  },
-  root: "src/client",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src/client"),

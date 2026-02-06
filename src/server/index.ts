@@ -126,11 +126,7 @@ export default {
     const partyResponse = await routePartykitRequest(request, env);
     if (partyResponse) return partyResponse;
 
-    // static assets (Vite-built SPA) with SPA fallback
-    const assetResponse = await env.ASSETS.fetch(request);
-    if (assetResponse.status === 404) {
-      return env.ASSETS.fetch(new URL("/", request.url).toString());
-    }
-    return assetResponse;
+    // static assets (Vite-built SPA) — SPA fallback handled by wrangler.toml
+    return env.ASSETS.fetch(request);
   },
 };
