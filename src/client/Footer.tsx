@@ -45,7 +45,6 @@ export function Footer({ children }: { children: React.ReactNode }) {
           </a>{" "}
           ☁️
         </span>
-        <span className="max-sm:hidden">•</span>
         <a
           href="https://github.com/hasparus/gist-mom"
           target="_blank"
