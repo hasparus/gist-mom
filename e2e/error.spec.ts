@@ -31,7 +31,7 @@ base("403 error shows sign in prompt for unauthenticated user", async ({
     return route.continue();
   });
 
-  await page.goto("/hasparus/a8390723cd893a21db00beba580fca36");
+  await page.goto("/hasparus/198cfd97c8be1fb1d5967722fafc7331");
   await expect(page.getByText("Could not load this gist")).toBeVisible({
     timeout: 10_000,
   });

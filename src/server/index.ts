@@ -134,7 +134,13 @@ app.post("/api/gists/:id/commit", async (c) => {
     await room.fetch("/committed", { method: "POST", body: content });
 
     return c.json(result);
-  } catch {
+  } catch (e) {
+    if (e instanceof GitHubApiError && e.status === 404) {
+      return c.json(
+        { error: "You don't have permission to edit this gist" },
+        403,
+      );
+    }
     return c.json({ error: "Commit failed" }, 502);
   }
 });

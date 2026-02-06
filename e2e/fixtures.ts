@@ -1,18 +1,18 @@
 import { test as base, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-/** Manifesto gist ID used in most tests */
-export const MANIFESTO_GIST_ID = "a8390723cd893a21db00beba580fca36";
-export const MANIFESTO_PATH = `/hasparus/${MANIFESTO_GIST_ID}`;
+/** Test gist ID — https://gist.github.com/hasparus/198cfd97c8be1fb1d5967722fafc7331 */
+export const TEST_GIST_ID = "198cfd97c8be1fb1d5967722fafc7331";
+export const TEST_GIST_PATH = `/hasparus/${TEST_GIST_ID}`;
 
-const MANIFESTO_API_RESPONSE = {
-  id: MANIFESTO_GIST_ID,
-  description: "gist.mom manifesto",
+const MOCK_GIST_RESPONSE = {
+  id: TEST_GIST_ID,
+  description: "test gist",
   owner: { login: "hasparus" },
   files: { "gist-mom.md": { filename: "gist-mom.md" } },
 };
 
-const MANIFESTO_COMMITS = [
+const MOCK_COMMITS = [
   {
     version: "0362b5b1234567890abcdef",
     user: { login: "hasparus" },
@@ -43,8 +43,8 @@ const MOCK_SESSION = {
 
 const MOCK_GISTS = [
   {
-    id: MANIFESTO_GIST_ID,
-    description: "gist.mom manifesto",
+    id: TEST_GIST_ID,
+    description: "test gist",
     owner: { login: "hasparus" },
     files: { "gist-mom.md": { filename: "gist-mom.md" } },
   },
@@ -67,14 +67,14 @@ function fulfill(route: { fulfill: Function }, body: unknown) {
 async function mockGistRoutes(page: Page) {
   // Register most-specific routes first
   await page.route(
-    `**/api/gists/${MANIFESTO_GIST_ID}/commits`,
-    (route) => fulfill(route, MANIFESTO_COMMITS)
+    `**/api/gists/${TEST_GIST_ID}/commits`,
+    (route) => fulfill(route, MOCK_COMMITS)
   );
   await page.route(
-    `**/api/gists/${MANIFESTO_GIST_ID}`,
+    `**/api/gists/${TEST_GIST_ID}`,
     (route) =>
       route.request().method() === "GET"
-        ? fulfill(route, MANIFESTO_API_RESPONSE)
+        ? fulfill(route, MOCK_GIST_RESPONSE)
         : route.continue()
   );
 }

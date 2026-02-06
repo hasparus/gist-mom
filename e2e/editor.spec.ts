@@ -1,7 +1,7 @@
-import { authedTest as test, expect, MANIFESTO_PATH } from "./fixtures";
+import { authedTest as test, expect, TEST_GIST_PATH } from "./fixtures";
 
 test("save button is disabled when no changes", async ({ page }) => {
-  await page.goto(MANIFESTO_PATH);
+  await page.goto(TEST_GIST_PATH);
   await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
 
   const saveBtn = page.getByRole("button", { name: "Save" });
@@ -9,7 +9,7 @@ test("save button is disabled when no changes", async ({ page }) => {
 });
 
 test("typing in editor inserts text", async ({ page }) => {
-  await page.goto(MANIFESTO_PATH);
+  await page.goto(TEST_GIST_PATH);
   const editor = page.locator(".cm-content");
   await expect(editor).toBeVisible({ timeout: 15_000 });
 
@@ -21,13 +21,13 @@ test("typing in editor inserts text", async ({ page }) => {
 });
 
 test("breadcrumb links to GitHub gist", async ({ page }) => {
-  await page.goto(MANIFESTO_PATH);
+  await page.goto(TEST_GIST_PATH);
   await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
 
-  const breadcrumb = page.locator("a", { hasText: "hasparus/a8390723" });
+  const breadcrumb = page.locator("a", { hasText: "hasparus/198cfd97" });
   await expect(breadcrumb).toHaveAttribute(
     "href",
-    "https://gist.github.com/hasparus/a8390723cd893a21db00beba580fca36"
+    "https://gist.github.com/hasparus/198cfd97c8be1fb1d5967722fafc7331"
   );
   await expect(breadcrumb).toHaveAttribute("target", "_blank");
 });

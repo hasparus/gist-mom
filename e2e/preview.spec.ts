@@ -1,7 +1,7 @@
-import { test, expect, MANIFESTO_PATH } from "./fixtures";
+import { test, expect, TEST_GIST_PATH } from "./fixtures";
 
 test("preview pane renders markdown", async ({ page }) => {
-  await page.goto(MANIFESTO_PATH);
+  await page.goto(TEST_GIST_PATH);
   await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
 
   await page.getByRole("button", { name: "Preview" }).click();
@@ -14,7 +14,7 @@ test("preview pane renders markdown", async ({ page }) => {
 });
 
 test("preview updates live as editor content changes", async ({ page }) => {
-  await page.goto(MANIFESTO_PATH);
+  await page.goto(TEST_GIST_PATH);
   const editor = page.locator(".cm-content");
   await expect(editor).toBeVisible({ timeout: 15_000 });
 

@@ -1,7 +1,7 @@
-import { authedTest as test, expect } from "./fixtures";
+import { authedTest as test, expect, TEST_GIST_PATH } from "./fixtures";
 
 test("user menu shows GitHub profile and gists links", async ({ page }) => {
-  await page.goto("/");
+  await page.goto(TEST_GIST_PATH);
   await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
 
   await page.locator("[data-slot='dropdown-menu-trigger']").click();
