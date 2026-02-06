@@ -26,6 +26,10 @@ Collaborative editor for GitHub Gists. Real-time multiplayer via Y.js + PartySer
 - `bun run test:e2e:ui` — Playwright UI mode
 - `bun run typecheck` — TypeScript check
 
+## Conventions
+
+- Use `bunx` not `npx`.
+
 ## Rules
 
 - Read PLAN.md before making architectural decisions.

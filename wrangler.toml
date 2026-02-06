@@ -1,25 +1,28 @@
 name = "gist-mom"
 main = "src/server/index.ts"
-compatibility_date = "2023-12-01"
-
-[vars]
-# partykit config
-PARTYKIT_HOST = "127.0.0.1:1999"
+compatibility_date = "2025-03-01"
+compatibility_flags = ["nodejs_compat"]
+assets = { directory = "dist", binding = "ASSETS" }
 
 [[durable_objects.bindings]]
-name = "PARTYKIT_DEFAULTS"
-class_name = "PartyServer"
+name = "GistRoom"
+class_name = "GistRoom"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["PartyServer"]
+new_classes = ["GistRoom"]
 
-[site]
-bucket = "dist"
+[[d1_databases]]
+binding = "DATABASE"
+database_name = "gist-mom-auth"
+database_id = "local"
+
+[vars]
+GITHUB_CLIENT_ID = "Ov23liWqVF5OFktFycCL"
 
 [build]
 watch_dir = "src/server"
 
 [dev]
 ip = "127.0.0.1"
-port = 8787
+port = 1999

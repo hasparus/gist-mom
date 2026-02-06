@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 8787;
+const PORT = 1999;
 const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
@@ -12,8 +12,11 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
     {
-      name: "mobile",
-      use: { ...devices["iPhone 13"], defaultBrowserType: "webkit" },
+      name: "authed",
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "e2e/.auth-state.json",
+      },
     },
   ],
   reporter: "html",
@@ -25,7 +28,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "bun run dev",
+    command: "bun run build && bunx wrangler dev",
     reuseExistingServer: !process.env["CI"],
     timeout: 120_000,
     url: baseURL,
