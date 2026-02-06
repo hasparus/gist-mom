@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GitCommitIcon } from "@hugeicons/core-free-icons";
 import { timeAgo } from "../lib/utils";
@@ -22,6 +22,11 @@ export function GistCommits({
   const [commits, setCommits] = useState<GistCommit[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCommits(null);
+    setError(null);
+  }, [gistId]);
 
   async function fetchCommits() {
     if (commits) return;
