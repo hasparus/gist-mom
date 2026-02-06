@@ -18,7 +18,7 @@ test("gist URL shows breadcrumb and preview button", async ({ page }) => {
   await expect(
     page.locator("a", { hasText: "hasparus/198cfd97" })
   ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Preview" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Preview" }).first()).toBeVisible();
 });
 
 test("navbar logo links home", async ({ page }) => {

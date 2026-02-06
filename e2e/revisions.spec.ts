@@ -16,5 +16,11 @@ test("revisions popover shows commit count after load", async ({ page }) => {
 
   const btn = page.getByRole("button", { name: /Revisions/ });
   await btn.click();
-  await expect(btn).toHaveText(/\d+ Revisions/, { timeout: 10_000 });
+  // Text may be visually hidden on mobile, so check inside the popover instead
+  await expect(page.getByText("Commit History")).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(
+    page.locator("[data-radix-popper-content-wrapper] a code").first(),
+  ).toBeVisible();
 });

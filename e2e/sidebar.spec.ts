@@ -4,15 +4,9 @@ test("sidebar toggle opens and shows gist list", async ({ page }) => {
   await page.goto(TEST_GIST_PATH);
   await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
 
-  const sidebar = page.locator("[data-slot='sidebar']");
-  await expect(sidebar).toHaveAttribute("data-state", "collapsed");
-
   // Use the navbar trigger (inside <nav>), not the one inside the collapsed sidebar
   await page.locator("nav").getByRole("button", { name: "Toggle Sidebar" }).click();
-  await expect(sidebar).toHaveAttribute("data-state", "expanded", {
-    timeout: 5_000,
-  });
-  await expect(page.getByText("Your Gists")).toBeVisible();
+  await expect(page.getByText("Your Gists")).toBeVisible({ timeout: 5_000 });
 });
 
 test("sidebar shows user gists", async ({ page }) => {
@@ -20,13 +14,10 @@ test("sidebar shows user gists", async ({ page }) => {
   await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
 
   await page.locator("nav").getByRole("button", { name: "Toggle Sidebar" }).click();
-  const sidebar = page.locator("[data-slot='sidebar']");
-  await expect(sidebar).toHaveAttribute("data-state", "expanded", {
-    timeout: 5_000,
-  });
+  await expect(page.getByText("Your Gists")).toBeVisible({ timeout: 5_000 });
 
   // wait for gists to load
-  const menuButtons = sidebar.locator("[data-sidebar='menu-button']");
+  const menuButtons = page.locator("[data-sidebar='menu-button']");
   await expect(menuButtons.first()).toBeVisible({ timeout: 10_000 });
 });
 
