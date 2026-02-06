@@ -1,6 +1,5 @@
 import { signIn } from "../lib/auth-client";
 import { navigate } from "../lib/router";
-import { GitHubIcon } from "./icons";
 import type { Session } from "../lib/types";
 import { UserProfileMenu } from "./UserProfileMenu";
 import { Button } from "./ui/button";
@@ -80,8 +79,7 @@ export function Navbar({
             size="sm"
             onClick={() => signIn.social({ provider: "github" })}
           >
-            <GitHubIcon className="size-4" />
-            Sign in with GitHub
+            Sign in
           </Button>
         )}
       </div>

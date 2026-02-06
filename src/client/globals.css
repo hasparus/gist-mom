@@ -125,23 +125,24 @@
 
 /* CodeMirror theme variables */
 :root {
-  --cm-comment: #6e7557;
-  --cm-punctuation: #6e7557;
-  --cm-keyword: #990069;
-  --cm-def: #171717;
-  --cm-property: #0e0f0b;
-  --cm-qualifier: #1c92a9;
-  --cm-attribute: #8b2bb9;
-  --cm-number: #1976d2;
-  --cm-string: #609a06;
-  --cm-builtin: #1976d2;
-  --cm-string-2: #0b7fc7;
-  --cm-variable: #e10198;
-  --cm-meta: #b33086;
-  --cm-atom: #1976d2;
+  --cm-comment: #9ca3af;
+  --cm-punctuation: #9ca3af;
+  --cm-keyword: #374151;
+  --cm-def: #111827;
+  --cm-property: #1f2937;
+  --cm-qualifier: #4b5563;
+  --cm-attribute: #6b7280;
+  --cm-number: #4b5563;
+  --cm-string: #92400e;
+  --cm-builtin: #4b5563;
+  --cm-string-2: #4b5563;
+  --cm-variable: #374151;
+  --cm-meta: #6b7280;
+  --cm-atom: #4b5563;
+  --cm-link: #2563eb;
 
   --cm-background: #ffffff;
-  --cm-foreground: #4f533f;
+  --cm-foreground: #374151;
   --cm-cursor: #000000;
   --cm-selection: #d7d4f0;
   --cm-hints-background: rgba(255, 255, 255, 0.8);
@@ -156,8 +157,8 @@
     --cm-comment: #737373;
     --cm-punctuation: #6e7557;
     --cm-keyword: #c2f653;
-    --cm-def: #dbf6a2;
-    --cm-property: #dbf6a2;
+    --cm-def: #e5e7eb;
+    --cm-property: #e5e7eb;
     --cm-qualifier: #1c92a9;
     --cm-attribute: #8b2bb9;
     --cm-number: #79b8ff;
@@ -167,6 +168,7 @@
     --cm-variable: #dbf6a2;
     --cm-meta: #ff99e0;
     --cm-atom: #79b8ff;
+    --cm-link: #93a3b8;
 
     --cm-background: transparent;
     --cm-foreground: #cfd3c5;
@@ -195,6 +197,26 @@
 .cm-variable { color: var(--cm-variable); }
 .cm-meta { color: var(--cm-meta); }
 .cm-atom { color: var(--cm-atom); }
+.cm-link { color: var(--cm-link); }
+.cm-mark { color: color-mix(in oklab, var(--cm-foreground) 50%, transparent); }
+.cm-inline-code {
+  background-color: color-mix(in oklab, var(--cm-foreground) 7%, transparent);
+  padding: 1px 0;
+}
+
+/* Opening backtick */
+.cm-mark:has(+ .cm-inline-code) {
+  background-color: color-mix(in oklab, var(--cm-foreground) 7%, transparent);
+  border-radius: 3px 0 0 3px;
+  padding: 1px 0;
+}
+
+/* Closing backtick */
+.cm-inline-code + .cm-mark {
+  background-color: color-mix(in oklab, var(--cm-foreground) 7%, transparent);
+  border-radius: 0 3px 3px 0;
+  padding: 1px 0;
+}
 .cm-invalidchar { color: #f00; }
 
 /* CodeMirror UI */

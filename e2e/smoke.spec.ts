@@ -12,7 +12,7 @@ test("root loads manifesto gist in editor", async ({ page }) => {
 test("sign in button visible", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.locator("button", { hasText: "Sign in with GitHub" }).first()
+    page.locator("button", { hasText: "Sign in" }).first()
   ).toBeVisible();
 });
 

@@ -10,7 +10,7 @@ export function Preview({ content }: { content: string }) {
 
   return (
     <div
-      className="preview prose prose-sm max-w-none px-8 py-4"
+      className="preview prose prose-sm dark:prose-invert max-w-none px-8 py-4"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
