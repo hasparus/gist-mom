@@ -1,4 +1,9 @@
-import { test, expect, TEST_GIST_PATH } from "./fixtures";
+import {
+  test,
+  expect,
+  TEST_GIST_PATH,
+  mockEphemeralGist,
+} from "./fixtures";
 
 test("preview pane renders markdown", async ({ page }) => {
   await page.goto(TEST_GIST_PATH);
@@ -14,7 +19,8 @@ test("preview pane renders markdown", async ({ page }) => {
 });
 
 test("preview updates live as editor content changes", async ({ page }) => {
-  await page.goto(TEST_GIST_PATH);
+  const { path } = await mockEphemeralGist(page);
+  await page.goto(path);
   const editor = page.locator(".cm-content");
   await expect(editor).toBeVisible({ timeout: 15_000 });
 

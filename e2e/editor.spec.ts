@@ -1,4 +1,9 @@
-import { authedTest as test, expect, TEST_GIST_PATH } from "./fixtures";
+import {
+  authedTest as test,
+  expect,
+  TEST_GIST_PATH,
+  mockEphemeralGistAuthed,
+} from "./fixtures";
 
 test("save button is disabled when no changes", async ({ page }) => {
   await page.goto(TEST_GIST_PATH);
@@ -9,7 +14,9 @@ test("save button is disabled when no changes", async ({ page }) => {
 });
 
 test("typing in editor inserts text", async ({ page }) => {
-  await page.goto(TEST_GIST_PATH);
+  // Use ephemeral gist so typed text doesn't pollute real gist DOs
+  const { path } = await mockEphemeralGistAuthed(page);
+  await page.goto(path);
   const editor = page.locator(".cm-content");
   await expect(editor).toBeVisible({ timeout: 15_000 });
 

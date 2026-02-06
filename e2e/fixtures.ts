@@ -5,6 +5,11 @@ import type { Page } from "@playwright/test";
 export const TEST_GIST_ID = "198cfd97c8be1fb1d5967722fafc7331";
 export const TEST_GIST_PATH = `/hasparus/${TEST_GIST_ID}`;
 
+/** Random gist ID per call — creates a fresh DO room that won't pollute real gists */
+export function ephemeralGistId() {
+  return `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 const MOCK_GIST_RESPONSE = {
   id: TEST_GIST_ID,
   description: "test gist",
@@ -64,19 +69,39 @@ function fulfill(route: { fulfill: Function }, body: unknown) {
   });
 }
 
-async function mockGistRoutes(page: Page) {
+async function mockGistRoutes(page: Page, gistId = TEST_GIST_ID) {
   // Register most-specific routes first
   await page.route(
-    `**/api/gists/${TEST_GIST_ID}/commits`,
+    `**/api/gists/${gistId}/commits`,
     (route) => fulfill(route, MOCK_COMMITS)
   );
   await page.route(
-    `**/api/gists/${TEST_GIST_ID}`,
+    `**/api/gists/${gistId}`,
     (route) =>
       route.request().method() === "GET"
-        ? fulfill(route, MOCK_GIST_RESPONSE)
+        ? fulfill(route, {
+            ...MOCK_GIST_RESPONSE,
+            id: gistId,
+          })
         : route.continue()
   );
+}
+
+/** Mock routes for an ephemeral gist ID. Returns { gistId, path }. */
+export async function mockEphemeralGist(page: Page) {
+  const gistId = ephemeralGistId();
+  await mockGistRoutes(page, gistId);
+  return { gistId, path: `/hasparus/${gistId}` };
+}
+
+/** Mock routes for an ephemeral gist with auth. Returns { gistId, path }. */
+export async function mockEphemeralGistAuthed(page: Page) {
+  await page.route("**/api/auth/get-session", (route) =>
+    fulfill(route, MOCK_SESSION)
+  );
+  const gistId = ephemeralGistId();
+  await mockGistRoutes(page, gistId);
+  return { gistId, path: `/hasparus/${gistId}` };
 }
 
 /**
