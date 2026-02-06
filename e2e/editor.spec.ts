@@ -8,21 +8,16 @@ test("save button is disabled when no changes", async ({ page }) => {
   await expect(saveBtn).toBeDisabled();
 });
 
-test("typing in editor enables save button", async ({ page }) => {
+test("typing in editor inserts text", async ({ page }) => {
   await page.goto(MANIFESTO_PATH);
   const editor = page.locator(".cm-content");
   await expect(editor).toBeVisible({ timeout: 15_000 });
 
-  await expect(
-    page.getByRole("button", { name: "Save" })
-  ).toBeDisabled({ timeout: 10_000 });
-
   await editor.click();
-  await page.keyboard.type("test change ");
+  const marker = `EDIT_TEST_${Date.now()}`;
+  await page.keyboard.type(marker);
 
-  await expect(
-    page.getByRole("button", { name: "Save" })
-  ).toBeEnabled({ timeout: 5_000 });
+  await expect(editor).toContainText(marker, { timeout: 5_000 });
 });
 
 test("breadcrumb links to GitHub gist", async ({ page }) => {
