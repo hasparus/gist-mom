@@ -279,9 +279,10 @@
   color: var(--cm-hints-active-foreground);
 }
 
-/* Reset global border/outline bleeding into CM internals */
+/* Reset global border/outline bleeding into CM internals —
+   exclude cursor elements that rely on border-left for rendering */
 .cm-editor,
-.cm-editor *:not(:focus-visible) {
+.cm-editor *:not(:focus-visible):not(.cm-cursor):not(.cm-dropCursor):not(.cm-ySelectionCaret) {
   border-color: transparent;
   outline-color: transparent;
 }

@@ -5,7 +5,23 @@ const STORAGE_KEY = "ydoc-state";
 
 export class GistRoom extends YjsDocument<Env> {
   private gistMeta: { filename: string } | null = null;
-  private lastCommittedContent: string = "";
+
+  private getMeta() {
+    return this.document.getMap("meta");
+  }
+
+  private getBaseline(): string {
+    return (this.getMeta().get("baseline") as string) ?? "";
+  }
+
+  private setBaseline(content: string) {
+    const meta = this.getMeta();
+    meta.set("baseline", content);
+    meta.set(
+      "commitVersion",
+      ((meta.get("commitVersion") as number) || 0) + 1,
+    );
+  }
 
   override async onLoad() {
     // Restore Y.Doc state from DO storage
@@ -30,10 +46,8 @@ export class GistRoom extends YjsDocument<Env> {
 
     // POST /committed — update baseline after successful commit
     if (request.method === "POST" && pathname.endsWith("/committed")) {
-      this.lastCommittedContent = await request.text();
-      // Broadcast to all clients via Y.js so they can update dirty state
-      const meta = this.document.getMap("meta");
-      meta.set("commitVersion", ((meta.get("commitVersion") as number) || 0) + 1);
+      const content = await request.text();
+      this.setBaseline(content);
       return new Response("ok");
     }
 
@@ -41,7 +55,7 @@ export class GistRoom extends YjsDocument<Env> {
       return Response.json({
         content: this.document.getText("content").toString(),
         filename: this.gistMeta?.filename || "file.md",
-        lastCommittedContent: this.lastCommittedContent,
+        lastCommittedContent: this.getBaseline(),
       });
     }
 
@@ -52,13 +66,15 @@ export class GistRoom extends YjsDocument<Env> {
         content: string;
       };
       this.gistMeta = { filename };
-      this.lastCommittedContent = content;
 
       const ytext = this.document.getText("content");
       if (ytext.length === 0) {
         ytext.insert(0, content);
       }
-      const meta = this.document.getMap("meta");
+      const meta = this.getMeta();
+      if (!meta.has("baseline")) {
+        meta.set("baseline", content);
+      }
       if (!meta.has("commitVersion")) {
         meta.set("commitVersion", 1);
       }

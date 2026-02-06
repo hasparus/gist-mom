@@ -83,6 +83,13 @@ export function Editor({ ytext, awareness, onCommit }: EditorProps) {
               return true;
             },
           },
+          {
+            key: "Escape",
+            run: (view) => {
+              view.contentDOM.blur();
+              return true;
+            },
+          },
         ]),
         yCollab(ytext, awareness),
       ],

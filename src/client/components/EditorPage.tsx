@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import YPartyKitProvider from "y-partyserver/provider";
 import * as Y from "yjs";
 import { Editor } from "./Editor";
@@ -45,7 +45,7 @@ export function EditorPage({
   const [content, setContent] = useState("");
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [seeded, setSeeded] = useState(false);
-  const baselineRef = useRef<string | null>(null);
+
 
   // Fetch gist via API (seeds DO + validates access)
   useEffect(() => {
@@ -97,40 +97,32 @@ export function EditorPage({
       p.destroy();
       doc.destroy();
       setCollab(null);
-      baselineRef.current = null;
       onDirtyChange(false);
     };
   }, [gistId, seeded]);
 
-  // When commitVersion changes (local or remote commit), reset baseline
+  // Track dirty state: compare content to baseline stored in Y.Doc meta
   useEffect(() => {
     if (!collab) return;
     const meta = collab.ydoc.getMap("meta");
-    const observer = () => {
-      if (typeof meta.get("commitVersion") === "number") {
-        baselineRef.current = collab.ydoc.getText("content").toString();
-        onDirtyChange(false);
-      }
-    };
-    meta.observe(observer);
-    // Check initial value (may already be set from sync)
-    observer();
-    return () => meta.unobserve(observer);
-  }, [collab, onDirtyChange]);
-
-  // Track content for preview + dirty state
-  useEffect(() => {
-    if (!collab) return;
     const ytext = collab.ydoc.getText("content");
-    const observer = () => {
+
+    const check = () => {
       const current = ytext.toString();
       setContent(current);
-      if (baselineRef.current !== null) {
-        onDirtyChange(current !== baselineRef.current);
+      const baseline = meta.get("baseline") as string | undefined;
+      if (baseline !== undefined) {
+        onDirtyChange(current !== baseline);
       }
     };
-    ytext.observe(observer);
-    return () => ytext.unobserve(observer);
+
+    ytext.observe(check);
+    meta.observe(check);
+    check();
+    return () => {
+      ytext.unobserve(check);
+      meta.unobserve(check);
+    };
   }, [collab, onDirtyChange]);
 
   // Report connected peers to parent
