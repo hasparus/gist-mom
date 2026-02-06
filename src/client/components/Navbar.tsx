@@ -65,6 +65,7 @@ export function Navbar({
               size="sm"
               onClick={onCommit}
               disabled={committing || !hasChanges}
+              title={!hasChanges && !committing ? "No changes yet" : undefined}
             >
               {committing ? "Saving..." : "Save"}
             </Button>
