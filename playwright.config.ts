@@ -11,13 +11,6 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
-    {
-      name: "authed",
-      use: {
-        ...devices["Desktop Chrome"],
-        storageState: "e2e/.auth-state.json",
-      },
-    },
   ],
   reporter: "html",
   retries: process.env["CI"] ? 2 : 0,
@@ -28,7 +21,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "bunx vite build && bunx vite preview --port 1999",
+    command: "bun run dev",
     reuseExistingServer: !process.env["CI"],
     timeout: 120_000,
     url: baseURL,

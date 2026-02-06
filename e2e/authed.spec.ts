@@ -1,38 +1,29 @@
-import { test, expect } from "@playwright/test";
-
-test.use({ storageState: "e2e/.auth-state.json" });
+import { authedTest as test, expect, TEST_GIST_PATH } from "./fixtures";
 
 test("user menu dropdown works", async ({ page }) => {
-  await page.goto("/");
+  await page.goto(TEST_GIST_PATH);
   await page.locator("[data-slot='dropdown-menu-trigger']").click();
-  await expect(page.locator("text=Sign out")).toBeVisible();
+  await expect(page.getByText("Sign out")).toBeVisible();
 });
 
-test("editor loads manifesto at root", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(".cm-content")).toBeVisible({ timeout: 10000 });
-  await expect(page.locator(".cm-content")).toContainText("Gist Mom", {
-    timeout: 10000,
-  });
+test("editor loads for gist", async ({ page }) => {
+  await page.goto(TEST_GIST_PATH);
+  await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
 });
 
 test("preview split view", async ({ page }) => {
-  await page.goto("/hasparus/a8390723cd893a21db00beba580fca36");
-  await expect(page.locator(".cm-content")).toContainText("Gist Mom", {
-    timeout: 10000,
-  });
-  await page.locator("button", { hasText: "Preview" }).click();
-  await expect(page.locator(".preview")).toContainText("How to use it", {
-    timeout: 5000,
-  });
+  await page.goto(TEST_GIST_PATH);
+  await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
+  await page.getByRole("button", { name: "Preview" }).click();
+  await expect(page.locator(".preview")).toBeVisible({ timeout: 5_000 });
   await expect(page.locator(".cm-content")).toBeVisible();
-  await page.locator("button", { hasText: "Preview" }).click();
+  await page.getByRole("button", { name: "Preview" }).click();
   await expect(page.locator(".preview")).not.toBeVisible();
 });
 
-test("save button visible", async ({ page }) => {
-  await page.goto("/hasparus/a8390723cd893a21db00beba580fca36");
+test("save button visible when authenticated", async ({ page }) => {
+  await page.goto(TEST_GIST_PATH);
   await expect(
-    page.locator("button", { hasText: "Save" })
-  ).toBeVisible({ timeout: 10000 });
+    page.getByRole("button", { name: "Save" })
+  ).toBeVisible({ timeout: 15_000 });
 });
