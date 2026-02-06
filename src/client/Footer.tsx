@@ -3,9 +3,9 @@ import { GitHubIcon } from "./components/icons";
 
 export function Footer({ children }: { children: React.ReactNode }) {
   return (
-    <footer className="flex h-11 shrink-0 items-center justify-center gap-2 border-t border-border px-2 text-xs text-muted-foreground">
+    <footer className="flex min-h-11 shrink-0 items-center justify-center gap-2 border-t border-border px-3 py-1.5 text-xs text-muted-foreground flex-wrap">
       {children}
-      <span className="flex items-center gap-2 ml-auto">
+      <span className="flex items-center gap-x-2 gap-y-0.5 ml-auto flex-wrap justify-start sm:justify-end">
         <span>
           built by{" "}
           <a
@@ -35,7 +35,7 @@ export function Footer({ children }: { children: React.ReactNode }) {
           </a>{" "}
           🎈 on{" "}
           <a
-            href="https://www.cloudflare.com/developer-platform/products/"
+            href="https://workers.cloudflare.com"
             target="_blank"
             rel="noopener noreferrer"
             className="underline decoration-muted-foreground/30 hover:text-foreground hover:decoration-foreground/50"
@@ -44,7 +44,7 @@ export function Footer({ children }: { children: React.ReactNode }) {
           </a>{" "}
           ☁️
         </span>
-        <span>•</span>
+        <span className="max-sm:hidden">•</span>
         <a
           href="https://github.com/hasparus/gist-mom"
           target="_blank"

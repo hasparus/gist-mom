@@ -49,10 +49,10 @@ export function GistCommits({
             size={16}
             className="rotate-90 text-muted-foreground"
           />
-          {commits?.length ?? ""} Revisions
+          <span className="max-sm:hidden">{commits?.length ?? ""} Revisions</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 p-0">
+      <PopoverContent align="end" className="w-[calc(100vw-16px)] sm:w-80 p-0 max-sm:translate-x-2">
         <div className="px-3 pt-1 pb-1.5 border-b border-border">
           <a
             href={`https://gist.github.com/${user}/${gistId}/revisions`}
@@ -85,13 +85,13 @@ export function GistCommits({
               href={`https://gist.github.com/${user}/${gistId}/${c.version}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent no-underline text-foreground transition-colors hover:duration-0"
+              className="flex items-center gap-2 px-3 py-3 sm:py-2 text-sm hover:bg-accent no-underline text-foreground transition-colors hover:duration-0"
             >
-              <code className="text-xs">{c.version.slice(0, 7)}</code>
-              <code className="text-xs text-muted-foreground">
+              <code className="text-sm sm:text-xs">{c.version.slice(0, 7)}</code>
+              <code className="text-sm sm:text-xs text-muted-foreground">
                 {c.user?.login}
               </code>
-              <span className="flex items-center gap-2 text-xs text-muted-foreground ml-auto">
+              <span className="flex items-center gap-2 text-sm sm:text-xs text-muted-foreground ml-auto">
                 {(c.change_status.additions > 0 ||
                   c.change_status.deletions > 0) && (
                   <span>
