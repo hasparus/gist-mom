@@ -163,6 +163,39 @@ app.post("/api/gists", async (c) => {
   }
 });
 
+app.get("/api/stars", async (c) => {
+  const cacheUrl = new URL(c.req.url);
+  const cache = (caches as unknown as { default: Cache }).default;
+  const cached = await cache.match(cacheUrl);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(
+      "https://api.github.com/repos/hasparus/gist-mom",
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "gist.mom",
+        },
+      }
+    );
+    const data = (await res.json()) as { stargazers_count?: number };
+    const stars = data.stargazers_count ?? 0;
+    const response = c.json({ stars });
+    // Clone before caching (response body can only be consumed once)
+    const toCache = new Response(JSON.stringify({ stars }), {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, max-age=3600",
+      },
+    });
+    c.executionCtx.waitUntil(cache.put(cacheUrl, toCache));
+    return response;
+  } catch {
+    return c.json({ stars: null }, 502);
+  }
+});
+
 app.get("/api/gists", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);
   if (!token) return c.json({ error: "Not authenticated" }, 401);

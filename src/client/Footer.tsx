@@ -61,12 +61,9 @@ export function Footer({ children }: { children: React.ReactNode }) {
   );
 }
 
-const starsPromise = fetch("https://api.github.com/repos/hasparus/gist-mom")
+const starsPromise = fetch("/api/stars")
   .then((r) => r.json())
-  .then(
-    (d: unknown) =>
-      (d as { stargazers_count?: number }).stargazers_count ?? null,
-  )
+  .then((d: unknown) => (d as { stars: number | null }).stars)
   .catch(() => null);
 
 function StarCount() {
