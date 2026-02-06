@@ -43,7 +43,7 @@ export function GistCommits({
   return (
     <Popover onOpenChange={(open) => open && fetchCommits()}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1">
+        <Button variant="ghost" size="sm" className="gap-1" aria-label="Revisions">
           <HugeiconsIcon
             icon={GitCommitIcon}
             size={16}
