@@ -3,6 +3,7 @@ import { D1Dialect } from "kysely-d1";
 
 export function createAuth(env: Env) {
   return betterAuth({
+    secret: env.BETTER_AUTH_SECRET,
     baseURL: env.AUTH_BASE_URL || "http://localhost:1999",
     basePath: "/api/auth",
     database: {

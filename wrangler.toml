@@ -27,6 +27,7 @@ GITHUB_CLIENT_ID = "Ov23lilf4Aq9AlPahXJW"
 ip = "127.0.0.1"
 port = 1999
 
+[observability]
 [observability.logs]
-enabled = false
+enabled = true
 invocation_logs = true
