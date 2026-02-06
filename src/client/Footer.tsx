@@ -3,8 +3,7 @@ import { GitHubIcon } from "./components/icons";
 
 export function Footer({ children }: { children: React.ReactNode }) {
   return (
-    <footer className="flex min-h-11 shrink-0 items-center justify-center border-t border-border text-xs text-muted-foreground">
-      <div className="flex items-center gap-2 w-full max-w-4xl mx-auto px-3 py-1.5 flex-wrap">
+    <footer className="flex min-h-11 shrink-0 items-center justify-center gap-2 border-t border-border px-3 py-1.5 text-xs text-muted-foreground flex-wrap">
       {children}
       <span className="flex items-center gap-x-2 gap-y-0.5 ml-auto flex-wrap justify-start sm:justify-end">
         <span>
@@ -59,7 +58,6 @@ export function Footer({ children }: { children: React.ReactNode }) {
           <GitHubIcon className="size-3.5" />
         </a>
       </span>
-      </div>
     </footer>
   );
 }
