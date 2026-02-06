@@ -5,10 +5,12 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-    "Liberation Mono", monospace;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
 }
 
 @theme inline {
@@ -203,22 +205,54 @@
 }
 
 /* CodeMirror syntax classes */
-.cm-comment { color: var(--cm-comment); }
-.cm-punctuation { color: var(--cm-punctuation); }
-.cm-keyword { color: var(--cm-keyword); }
-.cm-def { color: var(--cm-def); }
-.cm-property { color: var(--cm-property); }
-.cm-qualifier { color: var(--cm-qualifier); }
-.cm-attribute { color: var(--cm-attribute); }
-.cm-number { color: var(--cm-number); }
-.cm-string { color: var(--cm-string); }
-.cm-builtin { color: var(--cm-builtin); }
-.cm-string-2 { color: var(--cm-string-2); }
-.cm-variable { color: var(--cm-variable); }
-.cm-meta { color: var(--cm-meta); }
-.cm-atom { color: var(--cm-atom); }
-.cm-link { color: var(--cm-link); }
-.cm-mark { color: color-mix(in oklab, var(--cm-foreground) 50%, transparent); }
+.cm-comment {
+  color: var(--cm-comment);
+}
+.cm-punctuation {
+  color: var(--cm-punctuation);
+}
+.cm-keyword {
+  color: var(--cm-keyword);
+}
+.cm-def {
+  color: var(--cm-def);
+}
+.cm-property {
+  color: var(--cm-property);
+}
+.cm-qualifier {
+  color: var(--cm-qualifier);
+}
+.cm-attribute {
+  color: var(--cm-attribute);
+}
+.cm-number {
+  color: var(--cm-number);
+}
+.cm-string {
+  color: var(--cm-string);
+}
+.cm-builtin {
+  color: var(--cm-builtin);
+}
+.cm-string-2 {
+  color: var(--cm-string-2);
+}
+.cm-variable {
+  color: var(--cm-variable);
+}
+.cm-meta {
+  color: var(--cm-meta);
+}
+.cm-atom {
+  color: var(--cm-atom);
+}
+.cm-link {
+  color: var(--cm-link);
+}
+.cm-mark {
+  color: color-mix(in oklab, var(--cm-foreground) 50%, transparent);
+}
 .cm-inline-code {
   background-color: color-mix(in oklab, var(--cm-foreground) 7%, transparent);
   padding: 1px 0;
@@ -237,11 +271,17 @@
   border-radius: 0 3px 3px 0;
   padding: 1px 0;
 }
-.cm-invalidchar { color: #f00; }
+.cm-invalidchar {
+  color: #f00;
+}
 
 /* CodeMirror UI */
-.cm-selectionBackground { background: var(--cm-selection); }
-.cm-focused .cm-selectionBackground { background: var(--cm-selection); }
+.cm-selectionBackground {
+  background: var(--cm-selection);
+}
+.cm-focused .cm-selectionBackground {
+  background: var(--cm-selection);
+}
 
 .cm-editor .cm-tooltip {
   border: 1px solid var(--border);
@@ -257,7 +297,9 @@
   background: var(--cm-hints-background);
 }
 
-.cm-completionLabel { color: var(--cm-hints-foreground); }
+.cm-completionLabel {
+  color: var(--cm-hints-foreground);
+}
 
 .cm-editor .cm-completionDetail {
   color: var(--cm-def);
@@ -265,7 +307,9 @@
   font-size: 0.8em;
 }
 
-.cm-completionMatchedText { text-decoration: underline; }
+.cm-completionMatchedText {
+  text-decoration: underline;
+}
 
 .cm-tooltip.cm-tooltip-autocomplete > ul > li {
   color: var(--cm-hints-foreground);
@@ -282,7 +326,10 @@
 /* Reset global border/outline bleeding into CM internals —
    exclude cursor elements that rely on border-left for rendering */
 .cm-editor,
-.cm-editor *:not(:focus-visible):not(.cm-cursor):not(.cm-dropCursor):not(.cm-ySelectionCaret) {
+.cm-editor
+  *:not(:focus-visible):not(.cm-cursor):not(.cm-dropCursor):not(
+    .cm-ySelectionCaret
+  ) {
   border-color: transparent;
   outline-color: transparent;
 }
@@ -292,11 +339,15 @@
   text-decoration: underline;
 }
 
-.cm-nonmatchingBracket { color: #f00; }
+.cm-nonmatchingBracket {
+  color: #f00;
+}
 
 /* 16px on mobile to prevent Safari zoom-on-focus */
 @media (max-width: 639px) {
-  .cm-editor { font-size: 16px; }
+  .cm-editor {
+    font-size: 16px;
+  }
 }
 
 @layer base {

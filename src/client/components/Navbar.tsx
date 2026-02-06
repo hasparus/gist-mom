@@ -69,11 +69,13 @@ export function Navbar({
 
         <GistCommits key={gistId} user={user} gistId={gistId} />
 
-        <Button variant="secondary" size="sm" onClick={onTogglePreview} className="sm:hidden" aria-label="Preview">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={onTogglePreview}
+          aria-label="Preview"
+        >
           <HugeiconsIcon icon={EyeIcon} size={16} />
-        </Button>
-        <Button variant="secondary" size="sm" onClick={onTogglePreview} className="max-sm:hidden">
-          Preview
         </Button>
 
         {session ? (

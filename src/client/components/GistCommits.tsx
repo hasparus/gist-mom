@@ -43,22 +43,32 @@ export function GistCommits({
   return (
     <Popover onOpenChange={(open) => open && fetchCommits()}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1" aria-label="Revisions">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-1"
+          aria-label="Revisions"
+        >
           <HugeiconsIcon
             icon={GitCommitIcon}
             size={16}
             className="rotate-90 text-muted-foreground"
           />
-          <span className="max-sm:hidden">{commits?.length ?? ""} Revisions</span>
+          <span className="max-sm:hidden">
+            {commits?.length ?? ""} Revisions
+          </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[calc(100vw-16px)] sm:w-80 p-0 max-sm:translate-x-2">
+      <PopoverContent
+        align="end"
+        className="w-[calc(100vw-16px)] sm:w-80 p-0 max-sm:translate-x-2"
+      >
         <div className="px-3 pt-1 pb-1.5 border-b border-border">
           <a
             href={`https://gist.github.com/${user}/${gistId}/revisions`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium hover:underline no-underline text-muted-foreground"
+            className="text-sm sm:text-xs font-medium hover:underline no-underline text-muted-foreground"
           >
             Commit History
           </a>
@@ -87,7 +97,9 @@ export function GistCommits({
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-3 py-3 sm:py-2 text-sm hover:bg-accent no-underline text-foreground transition-colors hover:duration-0"
             >
-              <code className="text-sm sm:text-xs">{c.version.slice(0, 7)}</code>
+              <code className="text-sm sm:text-xs">
+                {c.version.slice(0, 7)}
+              </code>
               <code className="text-sm sm:text-xs text-muted-foreground">
                 {c.user?.login}
               </code>

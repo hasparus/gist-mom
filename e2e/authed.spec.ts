@@ -14,9 +14,9 @@ test("editor loads for gist", async ({ page }) => {
 test("preview toggle", async ({ page }) => {
   await page.goto(TEST_GIST_PATH);
   await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
-  await page.getByRole("button", { name: "Preview" }).first().click();
+  await page.getByRole("button", { name: "Preview" }).click();
   await expect(page.locator(".preview")).toBeVisible({ timeout: 5_000 });
-  await page.getByRole("button", { name: "Preview" }).first().click();
+  await page.getByRole("button", { name: "Preview" }).click();
   await expect(page.locator(".preview")).not.toBeVisible();
 });
 
