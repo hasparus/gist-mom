@@ -28,7 +28,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "bun run build && bunx wrangler dev",
+    command: "bunx vite build && bunx vite preview --port 1999",
     reuseExistingServer: !process.env["CI"],
     timeout: 120_000,
     url: baseURL,

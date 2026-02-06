@@ -19,4 +19,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src/client"),
     },
   },
+  server: {
+    port: 1999,
+  },
 });

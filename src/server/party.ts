@@ -26,6 +26,11 @@ export class GistRoom extends YjsDocument<Env> {
     await super.onStart(); // calls onLoad()
 
     const gistId = this.name;
+    const ytext = this.document.getText("content");
+
+    // Skip GitHub fetch if we already have content from DO storage
+    if (ytext.length > 0) return;
+
     try {
       const gist = await fetchGist(gistId);
       const files = Object.values(gist.files);
@@ -33,10 +38,7 @@ export class GistRoom extends YjsDocument<Env> {
         const file = files[0]!;
         this.gistMeta = { filename: file.filename };
         this.lastCommittedContent = file.content;
-        const ytext = this.document.getText("content");
-        if (ytext.length === 0) {
-          ytext.insert(0, file.content);
-        }
+        ytext.insert(0, file.content);
       }
     } catch (e) {
       console.error("Failed to load gist:", e);

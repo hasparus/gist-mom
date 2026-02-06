@@ -89,7 +89,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: oklch(0.145 0 0);
+    --background: oklch(0.165 0.004 75);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
     --card-foreground: oklch(0.985 0 0);
@@ -144,7 +144,7 @@
   --cm-background: #ffffff;
   --cm-foreground: #374151;
   --cm-cursor: #000000;
-  --cm-selection: #d7d4f0;
+  --cm-selection: #f8d0e0;
   --cm-hints-background: rgba(255, 255, 255, 0.8);
   --cm-hints-foreground: #080707;
   --cm-hints-active-background: rgba(23, 23, 23, 0.1);
@@ -155,25 +155,25 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --cm-comment: #737373;
-    --cm-punctuation: #6e7557;
+    --cm-punctuation: #b2b9a2;
     --cm-keyword: #c2f653;
-    --cm-def: #e5e7eb;
-    --cm-property: #e5e7eb;
+    --cm-def: #fdfdfd;
+    --cm-property: #fdfdfd;
     --cm-qualifier: #1c92a9;
     --cm-attribute: #8b2bb9;
     --cm-number: #79b8ff;
     --cm-string: #9ecbff;
     --cm-builtin: #79b8ff;
     --cm-string-2: #0b7fc7;
-    --cm-variable: #dbf6a2;
+    --cm-variable: #cfd3c5;
     --cm-meta: #ff99e0;
-    --cm-atom: #79b8ff;
+    --cm-atom: #9ca3af;
     --cm-link: #93a3b8;
 
     --cm-background: transparent;
     --cm-foreground: #cfd3c5;
     --cm-cursor: #c8e1ff;
-    --cm-selection: #3392ff44;
+    --cm-selection: #f472b650;
     --cm-hints-background: rgba(32, 32, 32, 0.8);
     --cm-hints-foreground: #e1e4e8;
     --cm-hints-active-background: rgba(200, 225, 255, 0.1);

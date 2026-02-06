@@ -1,5 +1,6 @@
 import { signIn } from "../lib/auth-client";
 import { navigate } from "../lib/router";
+import { GitHubIcon } from "./icons";
 import type { Session } from "../lib/types";
 import { UserProfileMenu } from "./UserProfileMenu";
 import { Button } from "./ui/button";
@@ -26,27 +27,28 @@ export function Navbar({
   return (
     <nav className="flex items-center gap-2 h-11 border-b border-border shrink-0">
       <div className="flex items-center gap-2 w-full max-w-4xl mx-auto px-2">
-        <a
-          href="/"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate("/");
-          }}
-          className="font-bold text-base text-foreground no-underline hover:opacity-70 transition-opacity"
-        >
-          gist.mom
-        </a>
+        <div className="flex items-center gap-1">
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/");
+            }}
+            className="font-medium text-sm text-foreground no-underline hover:opacity-70 transition-opacity"
+          >
+            gist.mom
+          </a>
+          <span className="text-muted-foreground text-xs">:</span>
 
-        <span className="text-muted-foreground">/</span>
-
-        <a
-          href={`https://gist.github.com/${user}/${gistId}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-muted-foreground truncate max-w-48 hover:text-foreground transition-colors no-underline"
-        >
-          {user}/{gistId.slice(0, 8)}
-        </a>
+          <a
+            href={`https://gist.github.com/${user}/${gistId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground truncate max-w-48 hover:text-foreground hover:underline transition-colors no-underline"
+          >
+            {user}/{gistId.slice(0, 8)}
+          </a>
+        </div>
 
         <div className="flex-1" />
 
@@ -79,6 +81,7 @@ export function Navbar({
             size="sm"
             onClick={() => signIn.social({ provider: "github" })}
           >
+            <GitHubIcon className="size-4" />
             Sign in
           </Button>
         )}
