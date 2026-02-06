@@ -218,12 +218,12 @@ app.get("/api/gists", async (c) => {
 });
 
 export default {
-  async fetch(request: Request, env: Env) {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
 
     // API routes via Hono
     if (url.pathname.startsWith("/api/")) {
-      return app.fetch(request, env);
+      return app.fetch(request, env, ctx);
     }
 
     // party routes (WebSocket + HTTP to DOs)
