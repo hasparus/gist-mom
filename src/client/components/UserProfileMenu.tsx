@@ -50,9 +50,8 @@ export function UserProfileMenu({ user }: { user: User }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1.5">
+        <Button variant="ghost" size="icon" className="rounded-full size-8">
           <UserAvatar user={user} />
-          <span className="hidden sm:inline">{username}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">

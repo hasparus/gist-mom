@@ -14,8 +14,6 @@ import {
   bracketMatching,
   foldKeymap,
   indentOnInput,
-  syntaxHighlighting,
-  defaultHighlightStyle,
 } from "@codemirror/language";
 import {
   autocompletion,
@@ -26,6 +24,7 @@ import {
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { markdown } from "@codemirror/lang-markdown";
 import { yCollab, yUndoManagerKeymap } from "y-codemirror.next";
+import { codeMirrorTheme } from "./codemirror-theme";
 import type * as Y from "yjs";
 import type { Awareness } from "y-protocols/awareness";
 
@@ -37,7 +36,7 @@ const minimalSetup = [
   dropCursor(),
   EditorState.allowMultipleSelections.of(true),
   indentOnInput(),
-  syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+  codeMirrorTheme,
   bracketMatching(),
   closeBrackets(),
   autocompletion(),
@@ -96,5 +95,5 @@ export function Editor({ ytext, awareness, onCommit }: EditorProps) {
     };
   }, [ytext, awareness]);
 
-  return <div ref={ref} style={{ height: "100%" }} />;
+  return <div ref={ref} className="h-full [&_.cm-editor]:h-full" />;
 }

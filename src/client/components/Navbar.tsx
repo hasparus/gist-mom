@@ -26,7 +26,7 @@ export function Navbar({
 }) {
   return (
     <nav className="flex items-center gap-2 h-11 border-b border-border shrink-0">
-      <div className="flex items-center gap-2 w-full max-w-4xl mx-auto px-3">
+      <div className="flex items-center gap-2 w-full max-w-4xl mx-auto px-2">
         <a
           href="/"
           onClick={(e) => {
@@ -61,7 +61,9 @@ export function Navbar({
 
         {session ? (
           <>
-            <span title={!hasChanges && !committing ? "No changes yet" : undefined}>
+            <span
+              title={!hasChanges && !committing ? "No changes yet" : undefined}
+            >
               <Button
                 size="sm"
                 onClick={onCommit}

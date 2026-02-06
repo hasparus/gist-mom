@@ -18,7 +18,7 @@ test("sign in button visible", async ({ page }) => {
 
 test("direct gist URL loads editor", async ({ page }) => {
   await page.goto("/hasparus/a8390723cd893a21db00beba580fca36");
-  await expect(page.locator("text=hasparus/a8390723")).toBeVisible();
+  await expect(page.locator("nav a", { hasText: "hasparus/a8390723" })).toBeVisible();
   await expect(
     page.locator("button", { hasText: "Preview" })
   ).toBeVisible();

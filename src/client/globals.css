@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (prefers-color-scheme: dark);
 @plugin "@tailwindcss/typography";
 
 @theme {
@@ -87,39 +87,169 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+  }
 }
+
+/* CodeMirror theme variables */
+:root {
+  --cm-comment: #6e7557;
+  --cm-punctuation: #6e7557;
+  --cm-keyword: #990069;
+  --cm-def: #171717;
+  --cm-property: #0e0f0b;
+  --cm-qualifier: #1c92a9;
+  --cm-attribute: #8b2bb9;
+  --cm-number: #1976d2;
+  --cm-string: #609a06;
+  --cm-builtin: #1976d2;
+  --cm-string-2: #0b7fc7;
+  --cm-variable: #e10198;
+  --cm-meta: #b33086;
+  --cm-atom: #1976d2;
+
+  --cm-background: #ffffff;
+  --cm-foreground: #4f533f;
+  --cm-cursor: #000000;
+  --cm-selection: #d7d4f0;
+  --cm-hints-background: rgba(255, 255, 255, 0.8);
+  --cm-hints-foreground: #080707;
+  --cm-hints-active-background: rgba(23, 23, 23, 0.1);
+  --cm-hints-active-foreground: #ffffff;
+  --cm-gutter-border: #ddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cm-comment: #737373;
+    --cm-punctuation: #6e7557;
+    --cm-keyword: #c2f653;
+    --cm-def: #dbf6a2;
+    --cm-property: #dbf6a2;
+    --cm-qualifier: #1c92a9;
+    --cm-attribute: #8b2bb9;
+    --cm-number: #79b8ff;
+    --cm-string: #9ecbff;
+    --cm-builtin: #79b8ff;
+    --cm-string-2: #0b7fc7;
+    --cm-variable: #dbf6a2;
+    --cm-meta: #ff99e0;
+    --cm-atom: #79b8ff;
+
+    --cm-background: transparent;
+    --cm-foreground: #cfd3c5;
+    --cm-cursor: #c8e1ff;
+    --cm-selection: #3392ff44;
+    --cm-hints-background: rgba(32, 32, 32, 0.8);
+    --cm-hints-foreground: #e1e4e8;
+    --cm-hints-active-background: rgba(200, 225, 255, 0.1);
+    --cm-hints-active-foreground: #ffffff;
+    --cm-gutter-border: #1b1f20;
+  }
+}
+
+/* CodeMirror syntax classes */
+.cm-comment { color: var(--cm-comment); }
+.cm-punctuation { color: var(--cm-punctuation); }
+.cm-keyword { color: var(--cm-keyword); }
+.cm-def { color: var(--cm-def); }
+.cm-property { color: var(--cm-property); }
+.cm-qualifier { color: var(--cm-qualifier); }
+.cm-attribute { color: var(--cm-attribute); }
+.cm-number { color: var(--cm-number); }
+.cm-string { color: var(--cm-string); }
+.cm-builtin { color: var(--cm-builtin); }
+.cm-string-2 { color: var(--cm-string-2); }
+.cm-variable { color: var(--cm-variable); }
+.cm-meta { color: var(--cm-meta); }
+.cm-atom { color: var(--cm-atom); }
+.cm-invalidchar { color: #f00; }
+
+/* CodeMirror UI */
+.cm-selectionBackground { background: var(--cm-selection); }
+.cm-focused .cm-selectionBackground { background: var(--cm-selection); }
+
+.cm-editor .cm-tooltip {
+  border: 1px solid var(--border);
+  background: var(--cm-hints-background);
+  color: var(--cm-hints-foreground);
+  font-family: inherit;
+  font-size: inherit;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.4px);
+}
+
+.cm-tooltip-autocomplete {
+  background: var(--cm-hints-background);
+}
+
+.cm-completionLabel { color: var(--cm-hints-foreground); }
+
+.cm-editor .cm-completionDetail {
+  color: var(--cm-def);
+  font-style: normal;
+  font-size: 0.8em;
+}
+
+.cm-completionMatchedText { text-decoration: underline; }
+
+.cm-tooltip.cm-tooltip-autocomplete > ul > li {
+  color: var(--cm-hints-foreground);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cm-tooltip-autocomplete li:hover {
+  background-color: var(--cm-hints-active-background);
+  color: var(--cm-hints-active-foreground);
+}
+
+/* Reset global border/outline bleeding into CM internals */
+.cm-editor,
+.cm-editor * {
+  border-color: transparent;
+  outline-color: transparent;
+}
+
+.cm-matchingBracket {
+  color: #555;
+  text-decoration: underline;
+}
+
+.cm-nonmatchingBracket { color: #f00; }
 
 @layer base {
   * {

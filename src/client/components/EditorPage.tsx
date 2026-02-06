@@ -92,7 +92,7 @@ export function EditorPage({
         <div className="p-8 text-muted-foreground">Connecting...</div>
       ) : (
         <>
-          <div className="flex-1 overflow-auto max-w-4xl">
+          <div className="flex-1 overflow-auto max-w-4xl px-2">
             <Editor
               ytext={collab.ydoc.getText("content")}
               awareness={collab.provider.awareness}

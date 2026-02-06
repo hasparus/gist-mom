@@ -14,6 +14,9 @@ export function createAuth(env: Env) {
         clientId: env.GITHUB_CLIENT_ID,
         clientSecret: env.GITHUB_CLIENT_SECRET,
         scope: ["gist"],
+        mapProfileToUser: (profile) => ({
+          name: profile.login, // GitHub handle, not display name
+        }),
       },
     },
   });
