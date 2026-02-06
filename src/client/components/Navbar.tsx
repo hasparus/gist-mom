@@ -61,14 +61,15 @@ export function Navbar({
 
         {session ? (
           <>
-            <Button
-              size="sm"
-              onClick={onCommit}
-              disabled={committing || !hasChanges}
-              title={!hasChanges && !committing ? "No changes yet" : undefined}
-            >
-              {committing ? "Saving..." : "Save"}
-            </Button>
+            <span title={!hasChanges && !committing ? "No changes yet" : undefined}>
+              <Button
+                size="sm"
+                onClick={onCommit}
+                disabled={committing || !hasChanges}
+              >
+                {committing ? "Saving..." : "Save"}
+              </Button>
+            </span>
             <UserProfileMenu user={session.user} />
           </>
         ) : (
