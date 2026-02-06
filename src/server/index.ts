@@ -163,6 +163,39 @@ app.post("/api/gists", async (c) => {
   }
 });
 
+app.get("/api/stars", async (c) => {
+  const cacheUrl = new URL(c.req.url);
+  const cache = (caches as unknown as { default: Cache }).default;
+  const cached = await cache.match(cacheUrl);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(
+      "https://api.github.com/repos/hasparus/gist-mom",
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "gist.mom",
+        },
+      }
+    );
+    if (!res.ok) return c.json({ stars: null }, 502);
+    const data = (await res.json()) as { stargazers_count?: number };
+    const stars = data.stargazers_count ?? 0;
+    const body = JSON.stringify({ stars });
+    const headers = {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=3600",
+    };
+    c.executionCtx.waitUntil(
+      cache.put(cacheUrl, new Response(body, { headers }))
+    );
+    return new Response(body, { headers });
+  } catch {
+    return c.json({ stars: null }, 502);
+  }
+});
+
 app.get("/api/gists", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);
   if (!token) return c.json({ error: "Not authenticated" }, 401);
@@ -185,12 +218,12 @@ app.get("/api/gists", async (c) => {
 });
 
 export default {
-  async fetch(request: Request, env: Env) {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
 
     // API routes via Hono
     if (url.pathname.startsWith("/api/")) {
-      return app.fetch(request, env);
+      return app.fetch(request, env, ctx);
     }
 
     // party routes (WebSocket + HTTP to DOs)
