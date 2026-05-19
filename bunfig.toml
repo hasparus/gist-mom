@@ -1,0 +1,4 @@
+[install]
+# Supply-chain guard: skip npm versions published <7 days ago (malicious
+# versions are typically caught and unpublished within hours).
+minimumReleaseAge = 604800
