@@ -52,10 +52,15 @@ export class GistRoom extends YjsDocument<Env> {
     }
 
     if (request.method === "GET" && pathname.endsWith("/content")) {
+      const meta = this.getMeta();
       return Response.json({
         content: this.document.getText("content").toString(),
-        filename: this.gistMeta?.filename || "file.md",
+        filename:
+          (meta.get("filename") as string) ||
+          this.gistMeta?.filename ||
+          "file.md",
         lastCommittedContent: this.getBaseline(),
+        seeded: meta.has("baseline"),
       });
     }
 
@@ -66,6 +71,7 @@ export class GistRoom extends YjsDocument<Env> {
         content: string;
       };
       this.gistMeta = { filename };
+      this.getMeta().set("filename", filename);
 
       const ytext = this.document.getText("content");
       if (ytext.length === 0) {

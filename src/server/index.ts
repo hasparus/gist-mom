@@ -55,24 +55,27 @@ function getGistRoomStub(env: Env, gistId: string) {
   };
 }
 
+function seedRoom(
+  env: Env,
+  gistId: string,
+  file: { filename: string; content: string }
+) {
+  return getGistRoomStub(env, gistId).fetch("/seed", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: file.filename, content: file.content }),
+  });
+}
+
 app.get("/api/gists/:id", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);
   const gistId = c.req.param("id");
 
   try {
     const gist = await fetchGist(gistId, token ?? undefined);
-    const files = Object.values(gist.files);
-    if (files.length > 0) {
-      const file = files[0]!;
-      const room = getGistRoomStub(c.env, gistId);
-      await room.fetch("/seed", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.filename,
-          content: file.content,
-        }),
-      });
+    const file = Object.values(gist.files)[0];
+    if (file) {
+      await seedRoom(c.env, gistId, file);
     }
     return c.json({
       id: gist.id,
@@ -87,6 +90,25 @@ app.get("/api/gists/:id", async (c) => {
     });
   } catch (e) {
     if (e instanceof GitHubApiError) {
+      if (e.status === 404) {
+        const contentRes = await getGistRoomStub(c.env, gistId)
+          .fetch("/content")
+          .catch(() => null);
+        if (contentRes?.ok) {
+          const { filename, seeded } = (await contentRes.json()) as {
+            filename: string;
+            seeded: boolean;
+          };
+          if (seeded) {
+            return c.json({
+              id: gistId,
+              description: null,
+              owner: null,
+              files: { [filename]: { filename } },
+            });
+          }
+        }
+      }
       return c.json({ error: e.message }, e.status as 403 | 404);
     }
     const msg = e instanceof Error ? e.message : String(e);
@@ -172,6 +194,12 @@ app.post("/api/gists", async (c) => {
       description: description as string | undefined,
       public: isPublic === true,
     });
+    const file = Object.values(gist.files)[0];
+    if (file) {
+      await seedRoom(c.env, gist.id, file).catch((e) => {
+        console.error("POST /api/gists seed error:", e);
+      });
+    }
     return c.json(
       {
         id: gist.id,
