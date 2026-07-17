@@ -14,9 +14,7 @@ export function useGists() {
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
 
-  const prefetch = useCallback(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
+  const load = useCallback(() => {
     setLoading(true);
     setError(null);
     fetch("/api/gists", { credentials: "include" })
@@ -29,5 +27,16 @@ export function useGists() {
       .finally(() => setLoading(false));
   }, []);
 
-  return { gists, loading, error, prefetch };
+  const prefetch = useCallback(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+    load();
+  }, [load]);
+
+  const refresh = useCallback(() => {
+    fetchedRef.current = true;
+    load();
+  }, [load]);
+
+  return { gists, loading, error, prefetch, refresh };
 }

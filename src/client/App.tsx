@@ -20,6 +20,7 @@ export default function App() {
     loading: gistsLoading,
     error: gistsError,
     prefetch: prefetchGists,
+    refresh: refreshGists,
   } = useGists();
   const [showPreview, setShowPreview] = useState(false);
   const [saveStatus, setSaveStatus] = useState<
@@ -89,6 +90,7 @@ export default function App() {
           saveStatus={saveStatus}
           hasChanges={hasChanges}
           onPrefetchGists={prefetchGists}
+          onGistCreated={refreshGists}
         />
         <EditorPage
           key={route.gistId}

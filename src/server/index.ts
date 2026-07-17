@@ -149,19 +149,43 @@ app.post("/api/gists", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);
   if (!token) return c.json({ error: "Not authenticated" }, 401);
 
-  const body: Record<string, unknown> = await c.req
-    .json()
-    .catch(() => ({}));
+  const body: unknown = await c.req.json().catch(() => null);
+  if (typeof body !== "object" || body === null || Array.isArray(body)) {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+  const { filename, content, description, public: isPublic } =
+    body as Record<string, unknown>;
+  const badString = (v: unknown) => v !== undefined && typeof v !== "string";
+  if (
+    badString(filename) ||
+    badString(content) ||
+    badString(description) ||
+    (isPublic !== undefined && typeof isPublic !== "boolean")
+  ) {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+
   try {
     const gist = await createGist(token, {
-      filename:
-        typeof body.filename === "string" ? body.filename : undefined,
-      content: typeof body.content === "string" ? body.content : undefined,
-      description:
-        typeof body.description === "string" ? body.description : undefined,
-      public: body.public === true,
+      filename: filename as string | undefined,
+      content: content as string | undefined,
+      description: description as string | undefined,
+      public: isPublic === true,
     });
-    return c.json(gist, 201);
+    return c.json(
+      {
+        id: gist.id,
+        description: gist.description,
+        owner: gist.owner,
+        files: Object.fromEntries(
+          Object.entries(gist.files).map(([k, v]) => [
+            k,
+            { filename: v.filename },
+          ])
+        ),
+      },
+      201
+    );
   } catch {
     return c.json({ error: "GitHub API error" }, 502);
   }

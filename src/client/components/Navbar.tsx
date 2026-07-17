@@ -21,6 +21,7 @@ export function Navbar({
   saveStatus,
   hasChanges,
   onPrefetchGists,
+  onGistCreated,
 }: {
   session: Session;
   user: string;
@@ -31,6 +32,7 @@ export function Navbar({
   saveStatus: SaveStatus;
   hasChanges: boolean;
   onPrefetchGists?: () => void;
+  onGistCreated?: () => void;
 }) {
   return (
     <nav
@@ -68,7 +70,7 @@ export function Navbar({
 
         <div className="flex-1" />
 
-        {session && <NewGistMenu />}
+        {session && <NewGistMenu onCreated={onGistCreated} />}
 
         <GistCommits key={gistId} user={user} gistId={gistId} />
 

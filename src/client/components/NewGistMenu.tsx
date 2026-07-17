@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, GlobeIcon, LockIcon } from "@hugeicons/core-free-icons";
 import { navigate } from "../lib/router";
+import type { GistSummary } from "../lib/use-gists";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -12,11 +13,15 @@ import {
 
 type CreateStatus = "idle" | "creating" | "failed";
 
-export function NewGistMenu() {
+export function NewGistMenu({ onCreated }: { onCreated?: () => void }) {
   const [status, setStatus] = useState<CreateStatus>("idle");
+  const failedTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(failedTimerRef.current), []);
 
   const createGist = async (isPublic: boolean) => {
     if (status === "creating") return;
+    clearTimeout(failedTimerRef.current);
     setStatus("creating");
     try {
       const res = await fetch("/api/gists", {
@@ -26,16 +31,14 @@ export function NewGistMenu() {
         body: JSON.stringify({ public: isPublic }),
       });
       if (!res.ok) throw new Error(`Create failed: ${res.status}`);
-      const gist = (await res.json()) as {
-        id: string;
-        owner: { login: string } | null;
-      };
+      const gist = (await res.json()) as Pick<GistSummary, "id" | "owner">;
       setStatus("idle");
-      navigate(`/${gist.owner?.login ?? "anonymous"}/${gist.id}`);
+      onCreated?.();
+      navigate(`/${gist.owner?.login ?? "unknown"}/${gist.id}`);
     } catch (e) {
       console.error("Create gist error:", e);
       setStatus("failed");
-      setTimeout(() => setStatus("idle"), 2000);
+      failedTimerRef.current = setTimeout(() => setStatus("idle"), 2000);
     }
   };
 
