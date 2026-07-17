@@ -32,7 +32,7 @@ export function Navbar({
   saveStatus: SaveStatus;
   hasChanges: boolean;
   onPrefetchGists?: () => void;
-  onGistCreated?: () => void;
+  onGistCreated: () => void;
 }) {
   return (
     <nav

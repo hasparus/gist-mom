@@ -1,20 +1,26 @@
 import { useState, useRef, useCallback } from "react";
+import type { CreatedGist, GistSummary } from "../../shared/gists";
 
-export type GistSummary = {
-  id: string;
-  description: string | null;
-  owner: { login: string } | null;
-  files: Record<string, { filename: string }>;
-  updated_at: string;
-};
+export async function createGist(isPublic: boolean): Promise<CreatedGist> {
+  const res = await fetch("/api/gists", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ public: isPublic }),
+  });
+  if (!res.ok) throw new Error(`Create failed: ${res.status}`);
+  return res.json() as Promise<CreatedGist>;
+}
 
 export function useGists() {
   const [gists, setGists] = useState<GistSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
+  const loadSeqRef = useRef(0);
 
   const load = useCallback(() => {
+    const seq = ++loadSeqRef.current;
     setLoading(true);
     setError(null);
     fetch("/api/gists", { credentials: "include" })
@@ -22,9 +28,15 @@ export function useGists() {
         if (!res.ok) throw new Error(`${res.status}`);
         return res.json() as Promise<GistSummary[]>;
       })
-      .then(setGists)
-      .catch((e) => setError(String(e)))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (seq === loadSeqRef.current) setGists(data);
+      })
+      .catch((e) => {
+        if (seq === loadSeqRef.current) setError(String(e));
+      })
+      .finally(() => {
+        if (seq === loadSeqRef.current) setLoading(false);
+      });
   }, []);
 
   const prefetch = useCallback(() => {

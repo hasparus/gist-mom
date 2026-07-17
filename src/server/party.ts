@@ -4,8 +4,6 @@ import * as Y from "yjs";
 const STORAGE_KEY = "ydoc-state";
 
 export class GistRoom extends YjsDocument<Env> {
-  private gistMeta: { filename: string } | null = null;
-
   private getMeta() {
     return this.document.getMap("meta");
   }
@@ -55,10 +53,7 @@ export class GistRoom extends YjsDocument<Env> {
       const meta = this.getMeta();
       return Response.json({
         content: this.document.getText("content").toString(),
-        filename:
-          (meta.get("filename") as string) ||
-          this.gistMeta?.filename ||
-          "file.md",
+        filename: (meta.get("filename") as string) || "file.md",
         lastCommittedContent: this.getBaseline(),
         seeded: meta.has("baseline"),
       });
@@ -70,14 +65,13 @@ export class GistRoom extends YjsDocument<Env> {
         filename: string;
         content: string;
       };
-      this.gistMeta = { filename };
-      this.getMeta().set("filename", filename);
+      const meta = this.getMeta();
+      meta.set("filename", filename);
 
       const ytext = this.document.getText("content");
       if (ytext.length === 0) {
         ytext.insert(0, content);
       }
-      const meta = this.getMeta();
       if (!meta.has("baseline")) {
         meta.set("baseline", content);
       }

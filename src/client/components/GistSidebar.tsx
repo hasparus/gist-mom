@@ -2,7 +2,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { File01Icon } from "@hugeicons/core-free-icons";
 import { navigate } from "../lib/router";
 import type { Session } from "../lib/types";
-import type { GistSummary } from "../lib/use-gists";
+import type { GistSummary } from "../../shared/gists";
 import {
   Sidebar,
   SidebarContent,

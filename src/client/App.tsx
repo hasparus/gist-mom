@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { parseRoute, type Route } from "./lib/router";
 import { useSession } from "./lib/auth-client";
 import { useGists } from "./lib/use-gists";
+import { useTransientStatus } from "./lib/use-transient-status";
 import { PresenceAvatars, type Peer } from "./components/PresenceAvatars";
 import { Navbar } from "./components/Navbar";
 import { EditorPage } from "./components/EditorPage";
@@ -23,9 +24,11 @@ export default function App() {
     refresh: refreshGists,
   } = useGists();
   const [showPreview, setShowPreview] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<
-    "idle" | "saving" | "saved" | "failed"
-  >("idle");
+  const {
+    status: saveStatus,
+    set: setSaveStatus,
+    setTransient: setSaveTransient,
+  } = useTransientStatus<"idle" | "saving" | "saved" | "failed">("idle");
   const [hasChanges, setHasChanges] = useState(false);
   const [peers, setPeers] = useState<Peer[]>([]);
 
@@ -49,14 +52,12 @@ export default function App() {
       }
       if (!res.ok) throw new Error(`Commit failed: ${res.status}`);
       setHasChanges(false);
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2000);
+      setSaveTransient("saved", "idle");
     } catch (e) {
       console.error("Commit error:", e);
-      setSaveStatus("failed");
-      setTimeout(() => setSaveStatus("idle"), 2000);
+      setSaveTransient("failed", "idle");
     }
-  }, [session, saveStatus, hasChanges, route.gistId]);
+  }, [session, saveStatus, hasChanges, route.gistId, setSaveStatus, setSaveTransient]);
 
   // Global Ctrl+S / Cmd+S → commit
   useEffect(() => {
