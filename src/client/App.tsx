@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import { parseRoute, type Route } from "./lib/router";
+import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
+import { parseRoute } from "./lib/router";
 import { useSession } from "./lib/auth-client";
-import { GistsProvider } from "./lib/gists";
+import { GistsProvider } from "./lib/gists-provider";
 import { useTransientStatus } from "./lib/use-transient-status";
 import { PresenceAvatars, type Peer } from "./components/PresenceAvatars";
 import { Navbar } from "./components/Navbar";
@@ -12,10 +12,17 @@ import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 
 import { Footer } from "./Footer";
 
+function subscribeToPopstate(onChange: () => void) {
+  window.addEventListener("popstate", onChange);
+  return () => window.removeEventListener("popstate", onChange);
+}
+
 export default function App() {
-  const [route, setRoute] = useState<Route>(() =>
-    parseRoute(window.location.pathname),
+  const pathname = useSyncExternalStore(
+    subscribeToPopstate,
+    () => window.location.pathname,
   );
+  const route = parseRoute(pathname);
   const { data: session } = useSession();
   const [showPreview, setShowPreview] = useState(false);
   const {
@@ -26,12 +33,6 @@ export default function App() {
   const [hasChanges, setHasChanges] = useState(false);
   const [peers, setPeers] = useState<Peer[]>([]);
   const togglePreview = useCallback(() => setShowPreview((p) => !p), []);
-
-  useEffect(() => {
-    const onPopState = () => setRoute(parseRoute(window.location.pathname));
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, []);
 
   const handleCommit = useCallback(async () => {
     if (!session || saveStatus === "saving" || !hasChanges) return;
