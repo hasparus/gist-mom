@@ -5,6 +5,7 @@ import { useGists } from "./lib/use-gists";
 import { useTransientStatus } from "./lib/use-transient-status";
 import { PresenceAvatars, type Peer } from "./components/PresenceAvatars";
 import { Navbar } from "./components/Navbar";
+import { CommandPalette } from "./components/CommandPalette";
 import { EditorPage } from "./components/EditorPage";
 import { GistSidebar } from "./components/GistSidebar";
 import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
@@ -92,6 +93,17 @@ export default function App() {
           hasChanges={hasChanges}
           onPrefetchGists={prefetchGists}
           onGistCreated={refreshGists}
+        />
+        <CommandPalette
+          session={session}
+          user={route.user}
+          gistId={route.gistId}
+          gists={gists}
+          hasChanges={hasChanges}
+          onPrefetchGists={prefetchGists}
+          onGistCreated={refreshGists}
+          onCommit={handleCommit}
+          onTogglePreview={() => setShowPreview((p) => !p)}
         />
         <EditorPage
           key={route.gistId}

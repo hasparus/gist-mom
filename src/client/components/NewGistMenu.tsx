@@ -1,8 +1,6 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, GlobeIcon, LockIcon } from "@hugeicons/core-free-icons";
-import { navigate } from "../lib/router";
-import { createGist } from "../lib/use-gists";
-import { useTransientStatus } from "../lib/use-transient-status";
+import { useCreateGist } from "../lib/use-create-gist";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -11,25 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-type CreateStatus = "idle" | "creating" | "failed";
-
 export function NewGistMenu({ onCreated }: { onCreated: () => void }) {
-  const { status, set, setTransient } =
-    useTransientStatus<CreateStatus>("idle");
-
-  const create = async (isPublic: boolean) => {
-    if (status === "creating") return;
-    set("creating");
-    try {
-      const gist = await createGist(isPublic);
-      set("idle");
-      onCreated();
-      navigate(`/${gist.owner.login}/${gist.id}`);
-    } catch (e) {
-      console.error("Create gist error:", e);
-      setTransient("failed", "idle");
-    }
-  };
+  const { status, create } = useCreateGist(onCreated);
 
   return (
     <DropdownMenu>
