@@ -3,7 +3,7 @@ import {
   test,
   expect,
   TEST_GIST_ID,
-  mockEphemeralGistAuthed,
+  mockEphemeralGist,
 } from "./fixtures";
 
 authedTest("opens with Cmd+K and toggles preview", async ({ page }) => {
@@ -20,7 +20,7 @@ authedTest("opens with Cmd+K and toggles preview", async ({ page }) => {
 });
 
 authedTest("jumps to a gist from the palette", async ({ page }) => {
-  const { path } = await mockEphemeralGistAuthed(page);
+  const { path } = await mockEphemeralGist(page);
   await page.goto(path);
   await expect(page.locator(".cm-content")).toBeVisible({ timeout: 15_000 });
 

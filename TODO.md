@@ -24,6 +24,7 @@
 - [x] PresenceAvatars: Show all users in the Yjs session.
 - [x] Gist commits — show commit history panel (GET /gists/{id}/commits)
 - [x] New gist — navbar "+" menu creates a public or secret gist, redirects to editor
+- [x] Command palette — Cmd+K: create gists, save, toggle preview/sidebar, jump to your gists
 - [ ] Gist forks — show forks list (GET /gists/{id}/forks)
 - [ ] Fork gist — fork button (POST /gists/{id}/forks)
 - [ ] Star/unstar — star toggle (PUT/DELETE /gists/{id}/star)

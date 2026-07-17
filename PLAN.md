@@ -102,6 +102,7 @@ Real-time collaborative markdown editor backed by GitHub Gists. Edit locally or 
 | Collab | Y.js from day one | Core value prop, not optional |
 | Deploy | Cloudflare via Wrangler | PartyServer on Durable Objects (not partykit CLI) |
 | URL scheme | `/{user}/{gist_id}` | Mirrors GitHub convention |
+| Create read-lag fallback | Seeded DO room answers GETs for 5 min after seeding (authed users only) | GitHub reads can briefly 404 a just-created gist; deleted gists stay deleted once the window passes |
 
 ## MVP Build Order
 

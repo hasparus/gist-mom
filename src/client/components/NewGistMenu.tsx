@@ -1,6 +1,6 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, GlobeIcon, LockIcon } from "@hugeicons/core-free-icons";
-import { useCreateGist } from "../lib/use-create-gist";
+import { useGists } from "../lib/gists";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -9,18 +9,20 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-export function NewGistMenu({ onCreated }: { onCreated: () => void }) {
-  const { status, create } = useCreateGist(onCreated);
+export function NewGistMenu() {
+  const { create, createStatus } = useGists();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant={status === "failed" ? "destructive" : "secondary"}
+          variant={createStatus === "failed" ? "destructive" : "secondary"}
           size="sm"
           aria-label="New gist"
-          title={status === "failed" ? "Failed to create gist" : "New gist"}
-          disabled={status === "creating"}
+          title={
+            createStatus === "failed" ? "Failed to create gist" : "New gist"
+          }
+          disabled={createStatus === "creating"}
         >
           <HugeiconsIcon icon={Add01Icon} size={16} />
         </Button>

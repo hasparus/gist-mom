@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { parseRoute, type Route } from "./lib/router";
 import { useSession } from "./lib/auth-client";
-import { useGists } from "./lib/use-gists";
+import { GistsProvider } from "./lib/gists";
 import { useTransientStatus } from "./lib/use-transient-status";
 import { PresenceAvatars, type Peer } from "./components/PresenceAvatars";
 import { Navbar } from "./components/Navbar";
@@ -17,13 +17,6 @@ export default function App() {
     parseRoute(window.location.pathname),
   );
   const { data: session } = useSession();
-  const {
-    gists,
-    loading: gistsLoading,
-    error: gistsError,
-    prefetch: prefetchGists,
-    refresh: refreshGists,
-  } = useGists();
   const [showPreview, setShowPreview] = useState(false);
   const {
     status: saveStatus,
@@ -32,6 +25,7 @@ export default function App() {
   } = useTransientStatus<"idle" | "saving" | "saved" | "failed">("idle");
   const [hasChanges, setHasChanges] = useState(false);
   const [peers, setPeers] = useState<Peer[]>([]);
+  const togglePreview = useCallback(() => setShowPreview((p) => !p), []);
 
   useEffect(() => {
     const onPopState = () => setRoute(parseRoute(window.location.pathname));
@@ -73,39 +67,28 @@ export default function App() {
   }, [handleCommit]);
 
   return (
-    <SidebarProvider defaultOpen={false}>
-      <GistSidebar
-        session={session}
-        currentGistId={route.gistId}
-        gists={gists}
-        loading={gistsLoading}
-        error={gistsError}
-      />
-      <SidebarInset className="h-dvh">
-        <Navbar
-          session={session}
-          user={route.user}
-          gistId={route.gistId}
-          showPreview={showPreview}
-          onTogglePreview={() => setShowPreview((p) => !p)}
-          onCommit={handleCommit}
-          saveStatus={saveStatus}
-          hasChanges={hasChanges}
-          onPrefetchGists={prefetchGists}
-          onGistCreated={refreshGists}
-        />
-        <CommandPalette
-          session={session}
-          user={route.user}
-          gistId={route.gistId}
-          gists={gists}
-          hasChanges={hasChanges}
-          onPrefetchGists={prefetchGists}
-          onGistCreated={refreshGists}
-          onCommit={handleCommit}
-          onTogglePreview={() => setShowPreview((p) => !p)}
-        />
-        <EditorPage
+    <GistsProvider>
+      <SidebarProvider defaultOpen={false}>
+        <GistSidebar session={session} currentGistId={route.gistId} />
+        <SidebarInset className="h-dvh">
+          <Navbar
+            session={session}
+            user={route.user}
+            gistId={route.gistId}
+            onTogglePreview={togglePreview}
+            onCommit={handleCommit}
+            saveStatus={saveStatus}
+            hasChanges={hasChanges}
+          />
+          <CommandPalette
+            session={session}
+            user={route.user}
+            gistId={route.gistId}
+            hasChanges={hasChanges}
+            onCommit={handleCommit}
+            onTogglePreview={togglePreview}
+          />
+          <EditorPage
           key={route.gistId}
           gistId={route.gistId}
           session={session}
@@ -114,10 +97,11 @@ export default function App() {
           onDirtyChange={setHasChanges}
           onPeersChange={setPeers}
         />
-        <Footer>
-          <PresenceAvatars peers={peers} />
-        </Footer>
-      </SidebarInset>
-    </SidebarProvider>
+          <Footer>
+            <PresenceAvatars peers={peers} />
+          </Footer>
+        </SidebarInset>
+      </SidebarProvider>
+    </GistsProvider>
   );
 }

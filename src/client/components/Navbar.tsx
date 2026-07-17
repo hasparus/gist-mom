@@ -1,5 +1,6 @@
 import { signIn } from "../lib/auth-client";
 import { navigate } from "../lib/router";
+import { useGists } from "../lib/gists";
 import { GistCommits } from "./GistCommits";
 import { NewGistMenu } from "./NewGistMenu";
 import { GitHubIcon } from "./icons";
@@ -20,27 +21,23 @@ export function Navbar({
   onCommit,
   saveStatus,
   hasChanges,
-  onPrefetchGists,
-  onGistCreated,
 }: {
   session: Session;
   user: string;
   gistId: string;
-  showPreview?: boolean;
   onTogglePreview: () => void;
   onCommit: () => void;
   saveStatus: SaveStatus;
   hasChanges: boolean;
-  onPrefetchGists?: () => void;
-  onGistCreated: () => void;
 }) {
+  const { prefetch } = useGists();
   return (
     <nav
       aria-label="Main navigation"
       className="flex items-center h-11 border-b border-border shrink-0 overflow-x-hidden"
     >
       {session && (
-        <div className="shrink-0 pl-2" onMouseEnter={onPrefetchGists}>
+        <div className="shrink-0 pl-2" onMouseEnter={prefetch}>
           <SidebarTrigger />
         </div>
       )}
@@ -70,7 +67,7 @@ export function Navbar({
 
         <div className="flex-1" />
 
-        {session && <NewGistMenu onCreated={onGistCreated} />}
+        {session && <NewGistMenu />}
 
         <GistCommits key={gistId} user={user} gistId={gistId} />
 

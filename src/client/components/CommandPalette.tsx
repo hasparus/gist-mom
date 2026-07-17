@@ -11,10 +11,8 @@ import {
   SidebarLeftIcon,
 } from "@hugeicons/core-free-icons";
 import { navigate } from "../lib/router";
-import { gistLabel } from "../lib/gist-label";
-import { useCreateGist } from "../lib/use-create-gist";
+import { gistHref, gistLabel, useGists } from "../lib/gists";
 import type { Session } from "../lib/types";
-import type { GistSummary } from "../../shared/gists";
 import { useSidebar } from "./ui/sidebar";
 import {
   CommandDialog,
@@ -30,25 +28,19 @@ export function CommandPalette({
   session,
   user,
   gistId,
-  gists,
   hasChanges,
-  onPrefetchGists,
-  onGistCreated,
   onCommit,
   onTogglePreview,
 }: {
   session: Session;
   user: string;
   gistId: string;
-  gists: GistSummary[];
   hasChanges: boolean;
-  onPrefetchGists: () => void;
-  onGistCreated: () => void;
   onCommit: () => void;
   onTogglePreview: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const { create } = useCreateGist(onGistCreated);
+  const { gists, prefetch, create } = useGists();
   const { toggleSidebar } = useSidebar();
 
   useEffect(() => {
@@ -63,8 +55,8 @@ export function CommandPalette({
   }, []);
 
   useEffect(() => {
-    if (open) onPrefetchGists();
-  }, [open, onPrefetchGists]);
+    if (open && session) prefetch();
+  }, [open, session, prefetch]);
 
   const run = (fn: () => void) => () => {
     setOpen(false);
@@ -136,9 +128,7 @@ export function CommandPalette({
               <CommandItem
                 key={g.id}
                 value={`${gistLabel(g)} ${g.id}`}
-                onSelect={run(() =>
-                  navigate(`/${g.owner?.login ?? "unknown"}/${g.id}`),
-                )}
+                onSelect={run(() => navigate(gistHref(g)))}
               >
                 <HugeiconsIcon icon={File01Icon} />
                 {gistLabel(g)}
