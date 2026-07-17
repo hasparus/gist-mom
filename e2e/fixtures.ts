@@ -69,7 +69,7 @@ function fulfill(route: { fulfill: Function }, body: unknown) {
   });
 }
 
-async function mockGistRoutes(page: Page, gistId = TEST_GIST_ID) {
+export async function mockGistRoutes(page: Page, gistId = TEST_GIST_ID) {
   // Register most-specific routes first
   await page.route(
     `**/api/gists/${gistId}/commits`,

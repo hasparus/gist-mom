@@ -149,13 +149,17 @@ app.post("/api/gists", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);
   if (!token) return c.json({ error: "Not authenticated" }, 401);
 
+  const body: Record<string, unknown> = await c.req
+    .json()
+    .catch(() => ({}));
   try {
-    const body = await c.req.json();
     const gist = await createGist(token, {
-      filename: body.filename,
-      content: body.content,
-      description: body.description,
-      public: body.public,
+      filename:
+        typeof body.filename === "string" ? body.filename : undefined,
+      content: typeof body.content === "string" ? body.content : undefined,
+      description:
+        typeof body.description === "string" ? body.description : undefined,
+      public: body.public === true,
     });
     return c.json(gist, 201);
   } catch {

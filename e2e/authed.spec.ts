@@ -2,7 +2,7 @@ import { authedTest as test, expect, TEST_GIST_PATH } from "./fixtures";
 
 test("user menu dropdown works", async ({ page }) => {
   await page.goto(TEST_GIST_PATH);
-  await page.locator("[data-slot='dropdown-menu-trigger']").click();
+  await page.getByRole("button", { name: "User menu" }).click();
   await expect(page.getByText("Sign out")).toBeVisible();
 });
 

@@ -1,6 +1,7 @@
 import { signIn } from "../lib/auth-client";
 import { navigate } from "../lib/router";
 import { GistCommits } from "./GistCommits";
+import { NewGistMenu } from "./NewGistMenu";
 import { GitHubIcon } from "./icons";
 import type { Session } from "../lib/types";
 import { UserProfileMenu } from "./UserProfileMenu";
@@ -66,6 +67,8 @@ export function Navbar({
         </div>
 
         <div className="flex-1" />
+
+        {session && <NewGistMenu />}
 
         <GistCommits key={gistId} user={user} gistId={gistId} />
 
