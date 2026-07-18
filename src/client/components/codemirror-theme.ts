@@ -26,6 +26,33 @@ const editorTheme = EditorView.theme({
   ".cm-panels.cm-panels-bottom": {
     borderTop: "2px solid var(--cm-gutter-border)",
   },
+  // Search panel: CodeMirror's defaults assume a light background
+  ".cm-panel.cm-search": {
+    padding: "6px 24px 6px 8px",
+  },
+  ".cm-textfield": {
+    backgroundColor: "var(--cm-background)",
+    color: "var(--cm-foreground)",
+    border: "1px solid var(--border)",
+    borderRadius: "4px",
+  },
+  ".cm-button": {
+    backgroundImage: "none",
+    backgroundColor: "var(--secondary)",
+    color: "var(--secondary-foreground)",
+    border: "1px solid var(--border)",
+    borderRadius: "4px",
+  },
+  ".cm-button:active": {
+    backgroundImage: "none",
+    backgroundColor: "var(--muted)",
+  },
+  ".cm-panel.cm-search input[type=checkbox]": {
+    accentColor: "var(--primary)",
+  },
+  ".cm-panel.cm-search [name=close]": {
+    color: "var(--muted-foreground)",
+  },
   ".cm-searchMatch": {
     backgroundColor: "rgba(255, 255, 0, 0.4)",
     outline: "1px solid #457dff",

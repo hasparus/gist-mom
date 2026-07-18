@@ -1,38 +1,38 @@
-import { useState, useEffect, useCallback } from "react";
-import { parseRoute, type Route } from "./lib/router";
+import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
+import { parseRoute } from "./lib/router";
 import { useSession } from "./lib/auth-client";
-import { useGists } from "./lib/use-gists";
+import { GistsProvider } from "./lib/gists-provider";
+import { useTransientStatus } from "./lib/use-transient-status";
 import { PresenceAvatars, type Peer } from "./components/PresenceAvatars";
 import { Navbar } from "./components/Navbar";
+import { CommandPalette } from "./components/CommandPalette";
 import { EditorPage } from "./components/EditorPage";
 import { GistSidebar } from "./components/GistSidebar";
 import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 
 import { Footer } from "./Footer";
 
+function subscribeToPopstate(onChange: () => void) {
+  window.addEventListener("popstate", onChange);
+  return () => window.removeEventListener("popstate", onChange);
+}
+
 export default function App() {
-  const [route, setRoute] = useState<Route>(() =>
-    parseRoute(window.location.pathname),
+  const pathname = useSyncExternalStore(
+    subscribeToPopstate,
+    () => window.location.pathname,
   );
+  const route = parseRoute(pathname);
   const { data: session } = useSession();
-  const {
-    gists,
-    loading: gistsLoading,
-    error: gistsError,
-    prefetch: prefetchGists,
-  } = useGists();
   const [showPreview, setShowPreview] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<
-    "idle" | "saving" | "saved" | "failed"
-  >("idle");
+  const {
+    status: saveStatus,
+    set: setSaveStatus,
+    setTransient: setSaveTransient,
+  } = useTransientStatus<"idle" | "saving" | "saved" | "failed">("idle");
   const [hasChanges, setHasChanges] = useState(false);
   const [peers, setPeers] = useState<Peer[]>([]);
-
-  useEffect(() => {
-    const onPopState = () => setRoute(parseRoute(window.location.pathname));
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, []);
+  const togglePreview = useCallback(() => setShowPreview((p) => !p), []);
 
   const handleCommit = useCallback(async () => {
     if (!session || saveStatus === "saving" || !hasChanges) return;
@@ -48,14 +48,12 @@ export default function App() {
       }
       if (!res.ok) throw new Error(`Commit failed: ${res.status}`);
       setHasChanges(false);
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2000);
+      setSaveTransient("saved", "idle");
     } catch (e) {
       console.error("Commit error:", e);
-      setSaveStatus("failed");
-      setTimeout(() => setSaveStatus("idle"), 2000);
+      setSaveTransient("failed", "idle");
     }
-  }, [session, saveStatus, hasChanges, route.gistId]);
+  }, [session, saveStatus, hasChanges, route.gistId, setSaveStatus, setSaveTransient]);
 
   // Global Ctrl+S / Cmd+S → commit
   useEffect(() => {
@@ -70,27 +68,28 @@ export default function App() {
   }, [handleCommit]);
 
   return (
-    <SidebarProvider defaultOpen={false}>
-      <GistSidebar
-        session={session}
-        currentGistId={route.gistId}
-        gists={gists}
-        loading={gistsLoading}
-        error={gistsError}
-      />
-      <SidebarInset className="h-dvh">
-        <Navbar
-          session={session}
-          user={route.user}
-          gistId={route.gistId}
-          showPreview={showPreview}
-          onTogglePreview={() => setShowPreview((p) => !p)}
-          onCommit={handleCommit}
-          saveStatus={saveStatus}
-          hasChanges={hasChanges}
-          onPrefetchGists={prefetchGists}
-        />
-        <EditorPage
+    <GistsProvider>
+      <SidebarProvider defaultOpen={false}>
+        <GistSidebar session={session} currentGistId={route.gistId} />
+        <SidebarInset className="h-dvh">
+          <Navbar
+            session={session}
+            user={route.user}
+            gistId={route.gistId}
+            onTogglePreview={togglePreview}
+            onCommit={handleCommit}
+            saveStatus={saveStatus}
+            hasChanges={hasChanges}
+          />
+          <CommandPalette
+            session={session}
+            user={route.user}
+            gistId={route.gistId}
+            hasChanges={hasChanges}
+            onCommit={handleCommit}
+            onTogglePreview={togglePreview}
+          />
+          <EditorPage
           key={route.gistId}
           gistId={route.gistId}
           session={session}
@@ -99,10 +98,11 @@ export default function App() {
           onDirtyChange={setHasChanges}
           onPeersChange={setPeers}
         />
-        <Footer>
-          <PresenceAvatars peers={peers} />
-        </Footer>
-      </SidebarInset>
-    </SidebarProvider>
+          <Footer>
+            <PresenceAvatars peers={peers} />
+          </Footer>
+        </SidebarInset>
+      </SidebarProvider>
+    </GistsProvider>
   );
 }

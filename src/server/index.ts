@@ -10,6 +10,7 @@ import {
   GitHubApiError,
   updateGist,
 } from "./github";
+import type { CreatedGist, GistSummary } from "../shared/gists";
 
 export { GistRoom };
 
@@ -55,38 +56,78 @@ function getGistRoomStub(env: Env, gistId: string) {
   };
 }
 
+function seedRoom(
+  env: Env,
+  gistId: string,
+  gist: GistSummary & { files: Record<string, { content: string }> }
+) {
+  const file = Object.values(gist.files)[0];
+  if (!file) return Promise.resolve(null);
+  return getGistRoomStub(env, gistId).fetch("/seed", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      filename: file.filename,
+      content: file.content,
+      description: gist.description,
+      owner: gist.owner?.login ?? null,
+    }),
+  });
+}
+
+function toGistSummary(gist: GistSummary): GistSummary {
+  return {
+    id: gist.id,
+    description: gist.description,
+    owner: gist.owner,
+    files: Object.fromEntries(
+      Object.entries(gist.files).map(([k, v]) => [k, { filename: v.filename }])
+    ),
+  };
+}
+
+const ROOM_FALLBACK_WINDOW_MS = 5 * 60 * 1000;
+
+async function gistFromRoom(
+  env: Env,
+  gistId: string
+): Promise<GistSummary | null> {
+  const res = await getGistRoomStub(env, gistId)
+    .fetch("/meta")
+    .catch(() => null);
+  if (!res?.ok) return null;
+  const meta = (await res.json()) as {
+    seeded: boolean;
+    seededAt: number;
+    filename: string;
+    description: string | null;
+    owner: string | null;
+  };
+  if (!meta.seeded || Date.now() - meta.seededAt > ROOM_FALLBACK_WINDOW_MS) {
+    return null;
+  }
+  return {
+    id: gistId,
+    description: meta.description,
+    owner: meta.owner ? { login: meta.owner } : null,
+    files: { [meta.filename]: { filename: meta.filename } },
+  };
+}
+
 app.get("/api/gists/:id", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);
   const gistId = c.req.param("id");
 
   try {
     const gist = await fetchGist(gistId, token ?? undefined);
-    const files = Object.values(gist.files);
-    if (files.length > 0) {
-      const file = files[0]!;
-      const room = getGistRoomStub(c.env, gistId);
-      await room.fetch("/seed", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.filename,
-          content: file.content,
-        }),
-      });
-    }
-    return c.json({
-      id: gist.id,
-      description: gist.description,
-      owner: gist.owner,
-      files: Object.fromEntries(
-        Object.entries(gist.files).map(([k, v]) => [
-          k,
-          { filename: v.filename },
-        ])
-      ),
-    });
+    await seedRoom(c.env, gistId, gist);
+    return c.json(toGistSummary(gist));
   } catch (e) {
     if (e instanceof GitHubApiError) {
+      if (e.status === 404 && token) {
+        const fallback = await gistFromRoom(c.env, gistId);
+        if (fallback) return c.json(fallback);
+      }
       return c.json({ error: e.message }, e.status as 403 | 404);
     }
     const msg = e instanceof Error ? e.message : String(e);
@@ -149,15 +190,28 @@ app.post("/api/gists", async (c) => {
   const token = await getGitHubToken(c.env, c.req.raw.headers);
   if (!token) return c.json({ error: "Not authenticated" }, 401);
 
+  const body = (await c.req.json().catch(() => undefined)) as
+    | { public?: unknown }
+    | undefined
+    | null;
+  if (body === undefined) return c.json({ error: "Invalid JSON body" }, 400);
+  const isPublic = body?.public;
+  if (isPublic !== undefined && typeof isPublic !== "boolean") {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+
   try {
-    const body = await c.req.json();
-    const gist = await createGist(token, {
-      filename: body.filename,
-      content: body.content,
-      description: body.description,
-      public: body.public,
+    const gist = await createGist(token, { public: isPublic === true });
+    const { owner } = gist;
+    if (!owner) {
+      console.error("POST /api/gists: GitHub returned gist without owner");
+      return c.json({ error: "GitHub API error" }, 502);
+    }
+    await seedRoom(c.env, gist.id, gist).catch((e) => {
+      console.error("POST /api/gists seed error:", e);
     });
-    return c.json(gist, 201);
+    const created: CreatedGist = { ...toGistSummary(gist), owner };
+    return c.json(created, 201);
   } catch {
     return c.json({ error: "GitHub API error" }, 502);
   }

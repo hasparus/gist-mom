@@ -4,8 +4,6 @@ import * as Y from "yjs";
 const STORAGE_KEY = "ydoc-state";
 
 export class GistRoom extends YjsDocument<Env> {
-  private gistMeta: { filename: string } | null = null;
-
   private getMeta() {
     return this.document.getMap("meta");
   }
@@ -52,26 +50,44 @@ export class GistRoom extends YjsDocument<Env> {
     }
 
     if (request.method === "GET" && pathname.endsWith("/content")) {
+      const meta = this.getMeta();
       return Response.json({
         content: this.document.getText("content").toString(),
-        filename: this.gistMeta?.filename || "file.md",
+        filename: (meta.get("filename") as string) || "file.md",
         lastCommittedContent: this.getBaseline(),
+      });
+    }
+
+    if (request.method === "GET" && pathname.endsWith("/meta")) {
+      const meta = this.getMeta();
+      return Response.json({
+        seeded: meta.has("baseline"),
+        seededAt: (meta.get("seededAt") as number) ?? 0,
+        filename: (meta.get("filename") as string) || "file.md",
+        description: (meta.get("description") as string | null) ?? null,
+        owner: (meta.get("owner") as string | null) ?? null,
       });
     }
 
     // POST /seed — populate Y.Doc with initial gist content (only if empty)
     if (request.method === "POST" && pathname.endsWith("/seed")) {
-      const { filename, content } = (await request.json()) as {
-        filename: string;
-        content: string;
-      };
-      this.gistMeta = { filename };
+      const { filename, content, description, owner } =
+        (await request.json()) as {
+          filename: string;
+          content: string;
+          description: string | null;
+          owner: string | null;
+        };
+      const meta = this.getMeta();
+      meta.set("filename", filename);
+      meta.set("description", description);
+      meta.set("owner", owner);
+      meta.set("seededAt", Date.now());
 
       const ytext = this.document.getText("content");
       if (ytext.length === 0) {
         ytext.insert(0, content);
       }
-      const meta = this.getMeta();
       if (!meta.has("baseline")) {
         meta.set("baseline", content);
       }
