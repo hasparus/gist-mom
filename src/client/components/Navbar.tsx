@@ -67,8 +67,6 @@ export function Navbar({
 
         <div className="flex-1" />
 
-        {session && <NewGistMenu />}
-
         <GistCommits key={gistId} user={user} gistId={gistId} />
 
         <Button
@@ -108,6 +106,7 @@ export function Navbar({
                       : "Save"}
               </Button>
             </span>
+            <NewGistMenu />
             <UserProfileMenu user={session.user} />
           </>
         ) : (
