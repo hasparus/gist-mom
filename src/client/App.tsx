@@ -98,9 +98,16 @@ export default function App() {
             onDirtyChange={setHasChanges}
             onPeersChange={setPeers}
           />
-          <Footer>
-            <PresenceAvatars peers={peers} />
-          </Footer>
+          {peers.length > 0 && (
+            <div className="pointer-events-none sticky bottom-0 z-10">
+              <div className="mx-auto flex w-full max-w-4xl px-3 pb-2">
+                <div className="pointer-events-auto">
+                  <PresenceAvatars peers={peers} />
+                </div>
+              </div>
+            </div>
+          )}
+          <Footer />
         </SidebarInset>
       </SidebarProvider>
     </GistsProvider>

@@ -1,11 +1,10 @@
 import { Suspense, use } from "react";
 import { GitHubIcon } from "./components/icons";
 
-export function Footer({ children }: { children: React.ReactNode }) {
+export function Footer() {
   return (
     <footer className="flex min-h-11 shrink-0 items-center justify-center border-t border-border text-xs text-muted-foreground">
       <div className="flex items-center justify-between gap-2 w-full max-w-4xl mx-auto px-3 py-1.5 flex-wrap">
-      {children}
       <span>
         built by{" "}
         <a
