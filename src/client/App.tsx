@@ -71,7 +71,7 @@ export default function App() {
     <GistsProvider>
       <SidebarProvider defaultOpen={false}>
         <GistSidebar session={session} currentGistId={route.gistId} />
-        <SidebarInset className="h-dvh">
+        <SidebarInset className="min-h-dvh">
           <Navbar
             session={session}
             user={route.user}
@@ -90,14 +90,14 @@ export default function App() {
             onTogglePreview={togglePreview}
           />
           <EditorPage
-          key={route.gistId}
-          gistId={route.gistId}
-          session={session}
-          showPreview={showPreview}
-          onCommit={handleCommit}
-          onDirtyChange={setHasChanges}
-          onPeersChange={setPeers}
-        />
+            key={route.gistId}
+            gistId={route.gistId}
+            session={session}
+            showPreview={showPreview}
+            onCommit={handleCommit}
+            onDirtyChange={setHasChanges}
+            onPeersChange={setPeers}
+          />
           <Footer>
             <PresenceAvatars peers={peers} />
           </Footer>

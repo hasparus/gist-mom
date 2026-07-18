@@ -158,7 +158,7 @@ export function EditorPage({
   if (fetchError) {
     const isRateLimit = fetchError.includes("403");
     return (
-      <div className="flex-1 flex overflow-hidden justify-center">
+      <div className="flex-1 flex justify-center">
         <div className="max-w-4xl w-full px-4 pt-4 space-y-2">
           <p className="text-destructive font-medium" role="alert">
             <span aria-hidden="true">&#x26A0;&#xFE0F; </span>Could not load this gist
@@ -184,12 +184,12 @@ export function EditorPage({
   }
 
   return (
-    <div className="flex-1 flex overflow-hidden justify-center">
+    <div className="flex-1 flex justify-center">
       {!collab ? (
         <div role="status" aria-live="polite" className="max-w-4xl w-full pl-2 pr-4 pt-4 text-sm text-muted-foreground">Connecting...</div>
       ) : (
         <>
-          <div className={`flex-1 overflow-auto max-w-4xl px-0.5${showPreview ? " max-sm:hidden" : ""}`}>
+          <div className={`flex-1 max-w-4xl px-0.5${showPreview ? " max-sm:hidden" : ""}`}>
             <Editor
               ytext={collab.ydoc.getText("content")}
               awareness={collab.provider.awareness}
@@ -197,7 +197,7 @@ export function EditorPage({
             />
           </div>
           {showPreview && (
-            <div className="flex-1 overflow-auto sm:border-l border-border max-w-4xl">
+            <div className="flex-1 sm:border-l border-border max-w-4xl">
               <Preview content={content} />
             </div>
           )}

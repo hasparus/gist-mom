@@ -167,7 +167,7 @@ export function Editor({ ytext, awareness, onCommit }: EditorProps) {
   );
 
   return (
-    <div ref={ref} className="relative h-full [&_.cm-editor]:h-full">
+    <div ref={ref} className="relative h-full [&_.cm-editor]:min-h-full">
       <div
         role="separator"
         aria-orientation="vertical"
