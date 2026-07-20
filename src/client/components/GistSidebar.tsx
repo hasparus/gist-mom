@@ -1,8 +1,8 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import { File01Icon } from "@hugeicons/core-free-icons";
 import { navigate } from "../lib/router";
+import { gistHref, gistLabel, useGists } from "../lib/gists";
 import type { Session } from "../lib/types";
-import type { GistSummary } from "../lib/use-gists";
 import {
   Sidebar,
   SidebarContent,
@@ -16,26 +16,14 @@ import {
   SidebarTrigger,
 } from "./ui/sidebar";
 
-function gistLabel(g: GistSummary): string {
-  if (g.description) return g.description;
-  const files = Object.keys(g.files);
-  if (files.length > 0) return files[0]!;
-  return g.id.slice(0, 8);
-}
-
 export function GistSidebar({
   session,
   currentGistId,
-  gists,
-  loading,
-  error,
 }: {
   session: Session;
   currentGistId: string;
-  gists: GistSummary[];
-  loading: boolean;
-  error: string | null;
 }) {
+  const { gists, loading, error } = useGists();
   if (!session) return null;
 
   return (
@@ -68,7 +56,6 @@ export function GistSidebar({
             ) : (
               <SidebarMenu>
                 {gists.map((g) => {
-                  const owner = g.owner?.login ?? "unknown";
                   const isActive = g.id === currentGistId;
                   return (
                     <SidebarMenuItem key={g.id}>
@@ -77,7 +64,7 @@ export function GistSidebar({
                         tooltip={gistLabel(g)}
                         onClick={(e) => {
                           e.preventDefault();
-                          navigate(`/${owner}/${g.id}`);
+                          navigate(gistHref(g));
                         }}
                       >
                         <HugeiconsIcon icon={File01Icon} size={16} className="shrink-0" />
