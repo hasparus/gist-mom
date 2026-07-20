@@ -1,10 +1,10 @@
-import { YjsDocument } from "y-partyserver";
+import { YServer } from "y-partyserver";
 import * as Y from "yjs";
 
 const STORAGE_KEY = "ydoc-state";
 
-export class GistRoom extends YjsDocument<Env> {
-  private gistMeta: { filename: string } | null = null;
+export class GistRoom extends YServer<Env> {
+  static override options = { hibernate: true };
 
   private getMeta() {
     return this.document.getMap("meta");
@@ -54,7 +54,7 @@ export class GistRoom extends YjsDocument<Env> {
     if (request.method === "GET" && pathname.endsWith("/content")) {
       return Response.json({
         content: this.document.getText("content").toString(),
-        filename: this.gistMeta?.filename || "file.md",
+        filename: (this.getMeta().get("filename") as string) || "file.md",
         lastCommittedContent: this.getBaseline(),
       });
     }
@@ -65,13 +65,15 @@ export class GistRoom extends YjsDocument<Env> {
         filename: string;
         content: string;
       };
-      this.gistMeta = { filename };
 
       const ytext = this.document.getText("content");
       if (ytext.length === 0) {
         ytext.insert(0, content);
       }
       const meta = this.getMeta();
+      if (meta.get("filename") !== filename) {
+        meta.set("filename", filename);
+      }
       if (!meta.has("baseline")) {
         meta.set("baseline", content);
       }
