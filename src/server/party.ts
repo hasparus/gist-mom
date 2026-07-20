@@ -53,7 +53,7 @@ export class GistRoom extends YServer<Env> {
       return new Response("ok");
     }
 
-    if (request.method === "GET" && pathname.endsWith("/instance")) {
+    if (request.method === "GET" && pathname.endsWith("/_debug/instance")) {
       return Response.json({ instanceId: this.instanceId });
     }
 
