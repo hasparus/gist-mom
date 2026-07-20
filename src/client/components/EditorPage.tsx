@@ -101,6 +101,20 @@ export function EditorPage({
     };
   }, [gistId, seeded]);
 
+  useEffect(() => {
+    if (!collab) return;
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        collab.provider.disconnect();
+      } else {
+        collab.provider.connect();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [collab]);
+
   // Track dirty state: compare content to baseline stored in Y.Doc meta
   useEffect(() => {
     if (!collab) return;

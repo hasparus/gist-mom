@@ -6,6 +6,8 @@ const STORAGE_KEY = "ydoc-state";
 export class GistRoom extends YServer<Env> {
   static override options = { hibernate: true };
 
+  readonly instanceId = crypto.randomUUID();
+
   private getMeta() {
     return this.document.getMap("meta");
   }
@@ -49,6 +51,10 @@ export class GistRoom extends YServer<Env> {
       const content = await request.text();
       this.setBaseline(content);
       return new Response("ok");
+    }
+
+    if (request.method === "GET" && pathname.endsWith("/instance")) {
+      return Response.json({ instanceId: this.instanceId });
     }
 
     if (request.method === "GET" && pathname.endsWith("/content")) {
