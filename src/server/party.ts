@@ -1,9 +1,13 @@
-import { YjsDocument } from "y-partyserver";
+import { YServer } from "y-partyserver";
 import * as Y from "yjs";
 
 const STORAGE_KEY = "ydoc-state";
 
-export class GistRoom extends YjsDocument<Env> {
+export class GistRoom extends YServer<Env> {
+  static override options = { hibernate: true };
+
+  readonly instanceId = crypto.randomUUID();
+
   private getMeta() {
     return this.document.getMap("meta");
   }
@@ -47,6 +51,10 @@ export class GistRoom extends YjsDocument<Env> {
       const content = await request.text();
       this.setBaseline(content);
       return new Response("ok");
+    }
+
+    if (request.method === "GET" && pathname.endsWith("/_debug/instance")) {
+      return Response.json({ instanceId: this.instanceId });
     }
 
     if (request.method === "GET" && pathname.endsWith("/content")) {
