@@ -27,9 +27,15 @@ export class GistRoom extends YServer<Env> {
   private setBaseline(content: string) {
     const meta = this.getMeta();
     meta.set("baseline", content);
+    const commitVersion: unknown = meta.get("commitVersion");
     meta.set(
       "commitVersion",
-      ((meta.get("commitVersion") as number) || 0) + 1,
+      typeof commitVersion === "number" &&
+        Number.isSafeInteger(commitVersion) &&
+        commitVersion >= 0 &&
+        commitVersion < Number.MAX_SAFE_INTEGER
+        ? commitVersion + 1
+        : 1,
     );
   }
 

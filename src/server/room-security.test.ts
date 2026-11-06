@@ -192,6 +192,88 @@ function replaceText(doc: Y.Doc, content: string) {
 }
 
 describe("trusted gist save destination", () => {
+  for (const timing of ["before seed", "legacy storage", "after seed"]) {
+    test(`non-coercible commitVersion ${timing} cannot prevent trusted initialization or saving`, async () => {
+      const poison = { toString: null, valueOf: null };
+      const content = "Collaborative edit survives poisoned counter";
+      const legacy = timing === "legacy storage" ? new Y.Doc() : undefined;
+      if (legacy) {
+        replaceText(legacy, content);
+        legacy.getMap("meta").set("commitVersion", poison);
+        legacy.getMap("meta").set("filename", "B.md");
+      }
+      const h = createHarness(legacy);
+      legacy?.destroy();
+      expect((await h.meta()).seeded).toBe(false);
+      if (timing === "before seed") {
+        peerUpdate(h.room, (doc) => {
+          replaceText(doc, content);
+          doc.getMap("meta").set("commitVersion", poison);
+          doc.getMap("meta").set("filename", "B.md");
+        });
+      }
+      expect((await h.readGist()).status).toBe(200);
+      expect(await h.meta()).toMatchObject({ seeded: true, filename: "A.md" });
+      expect((await h.content()).lastCommittedContent).toBe(originalContent);
+      if (timing === "after seed") {
+        peerUpdate(h.room, (doc) => {
+          replaceText(doc, content);
+          doc.getMap("meta").set("commitVersion", poison);
+          doc.getMap("meta").set("filename", "B.md");
+        });
+      } else {
+        expect(h.room.document.getMap("meta").get("commitVersion")).toBe(1);
+      }
+      await h.room.onSave();
+      h.reload();
+      expect((await h.commit("owner")).status).toBe(200);
+      expect(patches).toEqual([
+        {
+          authorization: "Bearer owner-token",
+          files: { "A.md": { content } },
+        },
+      ]);
+      expect(h.room.document.getMap("meta").get("commitVersion")).toBe(
+        timing === "after seed" ? 1 : 2,
+      );
+      expect(h.room.document.getMap("meta").get("baseline")).toBe(content);
+      h.reload();
+      expect(await h.content()).toEqual({
+        content,
+        filename: "A.md",
+        lastCommittedContent: content,
+      });
+      expect((await h.commit("owner")).status).toBe(409);
+      expect(patches).toHaveLength(1);
+    });
+  }
+
+  test.each([
+    [0, 1],
+    [1, 2],
+    [Number.MAX_SAFE_INTEGER - 1, Number.MAX_SAFE_INTEGER],
+    [Number.MAX_SAFE_INTEGER, 1],
+    [Number.MAX_SAFE_INTEGER + 1, 1],
+    [-1, 1],
+    [1.5, 1],
+    [NaN, 1],
+    [Infinity, 1],
+    [-Infinity, 1],
+    ["2", 1],
+    [null, 1],
+    [true, 1],
+    [{}, 1],
+  ])("commitVersion %p advances safely to %p", async (version, expected) => {
+    const h = createHarness();
+    await h.readGist();
+    peerUpdate(h.room, (doc) => {
+      replaceText(doc, "Updated content");
+      doc.getMap("meta").set("commitVersion", version);
+    });
+    expect((await h.commit("owner")).status).toBe(200);
+    expect(h.room.document.getMap("meta").get("commitVersion")).toBe(expected);
+  });
+
   test("CRDT metadata cannot redirect the actual GitHub PATCH from A to B", async () => {
     const h = createHarness();
     expect((await h.readGist()).status).toBe(200);
