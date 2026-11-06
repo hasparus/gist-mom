@@ -162,9 +162,13 @@ app.post("/api/gists/:id/commit", async (c) => {
     const { content, filename, lastCommittedContent } =
       (await contentRes.json()) as {
         content: string;
-        filename: string;
-        lastCommittedContent: string;
+        filename: string | null;
+        lastCommittedContent: string | null;
       };
+
+    if (!filename) {
+      return c.json({ error: "Document has no trusted save destination" }, 502);
+    }
 
     if (content === lastCommittedContent) {
       return c.json({ error: "No changes to commit" }, 409);
@@ -283,7 +287,13 @@ export default {
       return app.fetch(request, env, ctx);
     }
 
-    // party routes (WebSocket + HTTP to DOs)
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (
+      parts[0] === "parties" &&
+      !["GET", "HEAD", "OPTIONS"].includes(request.method)
+    ) {
+      return new Response("Forbidden", { status: 403 });
+    }
     const partyResponse = await routePartykitRequest(request, env);
     if (partyResponse) return partyResponse;
 
