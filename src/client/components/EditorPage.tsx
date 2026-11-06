@@ -8,6 +8,7 @@ import { signIn } from "../lib/auth-client";
 import { Button } from "./ui/button";
 import type { Session } from "../lib/types";
 import type { Peer } from "./PresenceAvatars";
+import { parsePresence } from "../lib/presence";
 
 function randomColor() {
   const colors = [
@@ -136,15 +137,8 @@ export function EditorPage({
       const peers: Peer[] = [];
       awareness.getStates().forEach((state, clientId) => {
         if (clientId === awareness.clientID) return;
-        const user = state.user as
-          | { name?: string; color?: string; image?: string | null }
-          | undefined;
-        if (!user) return;
-        peers.push({
-          name: user.name || "Anonymous",
-          color: user.color || "#888",
-          image: user.image,
-        });
+        const { user } = parsePresence(state);
+        if (user) peers.push(user);
       });
       onPeersChange(peers);
     };
