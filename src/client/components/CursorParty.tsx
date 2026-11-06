@@ -1,8 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import type { Awareness } from "y-protocols/awareness";
 import { contrastText } from "./contrastText";
-
-type Cursor = { x: number; y: number; pointer: "mouse" | "touch" };
+import { MAX_MESSAGE_LENGTH, parsePresence, type Cursor } from "../lib/presence";
 type RemoteCursor = {
   clientId: number;
   name: string;
@@ -55,15 +54,14 @@ function useRemoteCursors(awareness: Awareness): RemoteCursor[] {
     const result: RemoteCursor[] = [];
     awareness.getStates().forEach((state, clientId) => {
       if (clientId === awareness.clientID) return;
-      const cursor = state.pointer as Cursor | null | undefined;
-      const user = state.user as { name?: string; color?: string } | undefined;
+      const { cursor, user, message } = parsePresence(state);
       if (!cursor || !user) return;
       result.push({
         clientId,
-        name: user.name || "Anonymous",
-        color: user.color || "#888",
+        name: user.name,
+        color: user.color,
         cursor,
-        message: (state.message as string) ?? null,
+        message,
       });
     });
     setCursors(result);
@@ -80,7 +78,6 @@ function useRemoteCursors(awareness: Awareness): RemoteCursor[] {
   return cursors;
 }
 
-const MAX_MESSAGE_LENGTH = 42;
 const CHAT_TIMEOUT_MS = 10_000;
 
 function useCursorChat(awareness: Awareness) {
@@ -203,9 +200,7 @@ export function CursorParty({ awareness }: { awareness: Awareness }) {
   const showCta = anyoneHasMessage && !listening && message.length === 0;
 
   // Get local user color for local chat bubble
-  const localState = awareness.getLocalState();
-  const localColor =
-    (localState?.user as { color?: string } | undefined)?.color ?? "#888";
+  const localColor = parsePresence(awareness.getLocalState()).user?.color ?? "#888888";
 
   if (cursors.length === 0 && !listening && !showCta) return null;
 

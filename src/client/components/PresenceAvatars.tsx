@@ -34,6 +34,7 @@ export function PresenceAvatars({ peers }: { peers: Peer[] }) {
           <Tooltip key={`${peer.name}-${peer.color}`}>
             <TooltipTrigger asChild>
               <Avatar
+                aria-label={peer.name}
                 size="sm"
                 className="ring-1"
                 style={{ "--tw-ring-color": peer.color } as React.CSSProperties}
