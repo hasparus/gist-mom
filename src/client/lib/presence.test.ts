@@ -52,6 +52,18 @@ describe("parsePresence", () => {
     }
   });
 
+  test("checks only the bounded name prefix for whitespace and preserves its formatting", () => {
+    for (const length of [128, 1_000_000]) {
+      const name = " ".repeat(length) + "x";
+      expect(parsePresence({ user: { ...user, name } }).user?.name).toBe("Anonymous");
+    }
+
+    const name = " \tAlice \n";
+    expect(parsePresence({ user: { ...user, name } }).user?.name).toBe(name);
+    const prefix = " ".repeat(127) + "x";
+    expect(parsePresence({ user: { ...user, name: prefix + " ".repeat(1_000_000) } }).user?.name).toBe(prefix);
+  });
+
   test("drops malformed pointers independently of valid peers and chat", () => {
     const invalid = [
       undefined, null, false, 1, "mouse", [],

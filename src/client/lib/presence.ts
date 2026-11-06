@@ -30,13 +30,11 @@ export function parsePresence(value: unknown): {
   const state = record(value);
   const user = record(state?.user);
   const pointer = record(state?.pointer);
+  const name = typeof user?.name === "string" ? user.name.slice(0, MAX_NAME_LENGTH) : "";
   return {
     user: user
       ? {
-          name:
-            typeof user.name === "string" && user.name.trim().length > 0
-              ? user.name.slice(0, MAX_NAME_LENGTH)
-              : "Anonymous",
+          name: name.trim().length > 0 ? name : "Anonymous",
           color:
             typeof user.color === "string" && HEX_COLOR.test(user.color)
               ? user.color
